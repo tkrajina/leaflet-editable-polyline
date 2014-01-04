@@ -1,25 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Editable polyline: work in progress</title>
-	<meta charset="utf-8" />
+    <title>Editable polyline: work in progress</title>
+    <meta charset="utf-8" />
 
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	<link rel="stylesheet" href="leaflet.css" />
+    <link rel="stylesheet" href="leaflet.css" />
 </head>
 <body>
-	<div id="map" style="width: 600px; height: 400px"></div>
+    <div id="map" style="width: 600px; height: 400px"></div>
 
-	<script src="leaflet.js"></script>
-	<script>
+    <script src="leaflet.js"></script>
+    <script>
 
-		var map = L.map('map').setView([51.505, -0.09], 13);
+        var map = L.map('map').setView([51.505, -0.09], 13);
 
-		L.tileLayer('tile.png', {
-			maxZoom: 18,
-			attribution: '...'
-		}).addTo(map);
+        L.tileLayer('tile.png', {
+            maxZoom: 18,
+            attribution: '...'
+        }).addTo(map);
 
         // Plugin:
         L.Polyline.polylineEditor = L.Polyline.extend({
@@ -128,10 +128,10 @@
         for(var i = 0; i < 5; i++)
             coordinates.push([Math.sin(i / 100), i / 100]);
 
-		var polyline = L.Polyline.PolylineEditor(coordinates).addTo(map);
+        var polyline = L.Polyline.PolylineEditor(coordinates).addTo(map);
 
         map.fitBounds(polyline.getBounds());
 
-	</script>
+    </script>
 </body>
 </html>
