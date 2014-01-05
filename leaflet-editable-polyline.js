@@ -26,12 +26,12 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         }
 
         var map = this._map;
-        this._map.on( "zoomend", function( e ) {
-            console.log( "zoom level is " + map.getZoom() )
+        this._map.on("zoomend", function(e) {
+            console.log("zoom level is " + map.getZoom())
             that._showBoundMarkers();
         });
-        this._map.on( "moveend", function( e ) {
-            console.log( "zoom level is " + map.getZoom() )
+        this._map.on("moveend", function(e) {
+            console.log("zoom level is " + map.getZoom())
             that._showBoundMarkers();
         });
 
