@@ -127,6 +127,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             var pointNo = that._getPointNo(event.target);
             that.setLatLngs(that._getMarkerLatLngs());
             that._fixNeighbourPositions(pointNo);
+            that._showBoundMarkers();
         });
         marker.on('contextmenu', function(event) {
             console.log('rightclick');
@@ -143,6 +144,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 var pointNo = that._getPointNo(event.target);
                 that._addMarkers(pointNo, marker.getLatLng(), true);
                 that.setLatLngs(that._getMarkerLatLngs());
+                that._showBoundMarkers();
             });
         }
 
