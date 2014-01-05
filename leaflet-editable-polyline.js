@@ -1,5 +1,9 @@
 // Plugin:
 L.Polyline.polylineEditor = L.Polyline.extend({
+    /**
+     * This function must be explicitly called when the polyline is ready to 
+     * be edited.
+     */
     edit: function() {
         if(!this._map) {
             alert('Not added to map!');
@@ -31,6 +35,11 @@ L.Polyline.polylineEditor = L.Polyline.extend({
 
         return this;
     },
+    /**
+     * Show only markers in current map bounds *is* there are only a certain 
+     * number of markers. This method is called on eventy that change map 
+     * bounds.
+     */
     _showBoundMarkers: function() {
         var that = this;
         var bounds = this._map.getBounds();
@@ -56,7 +65,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         }
     },
     /**
-     * Prepare marker by adding some utils methods.
+     * Show/hide marker.
      */
     _setMarkerVisible: function(marker, show) {
         if(!marker)
@@ -64,9 +73,9 @@ L.Polyline.polylineEditor = L.Polyline.extend({
 
         var map = this._map;
         if(show) {
-            if(!marker._map) {
+            if(!marker._map) { // First show fo this marker:
                 marker.addTo(map);
-            } else {
+            } else { // Marker was already shown and hidden:
                 map.addLayer(marker);
             }
             marker._visible = true;
@@ -116,6 +125,9 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             this._fixNeighbourPositions(pointNo);
         }
     },
+    /**
+     * Fix nearby new point markers when the new point is created.
+     */
     _fixNeighbourPositions: function(pointNo) {
         var previousMarker = pointNo == 0 ? null : this._markers[pointNo - 1];
         var marker = this._markers[pointNo];
@@ -139,6 +151,9 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         console.log("Nothing found for:" + marker);
         return -1;
     },
+    /**
+     * Get polyline latLngs based on marker positions.
+     */
     _getMarkerLatLngs: function() {
         var result = [];
         for(var i = 0; i < this._markers.length; i++)
