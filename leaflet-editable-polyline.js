@@ -41,7 +41,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         if(!options)
             options = {};
 
-        // Do not show edit markers if more than this value woule be shown:
+        // Do not show edit markers if more than maxMarkers would be shown:
         if(!('maxMarkers' in options)) {
             options.maxMarkers = 100;
         }
