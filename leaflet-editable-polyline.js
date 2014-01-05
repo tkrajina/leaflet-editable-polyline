@@ -1,4 +1,3 @@
-// Plugin:
 L.Polyline.polylineEditor = L.Polyline.extend({
     /**
      * This function must be explicitly called when the polyline is ready to 
@@ -128,6 +127,9 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             var pointNo = that._getPointNo(event.target);
             that.setLatLngs(that._getMarkerLatLngs());
             that._fixNeighbourPositions(pointNo);
+        });
+        marker.on('contextmenu', function(event) {
+            console.log('rightclick');
         });
 
         if(pointNo > 0) {
