@@ -32,6 +32,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         return this;
     },
     _showBoundMarkers: function() {
+        var that = this;
         var bounds = this._map.getBounds();
         var found = 0;
         for(var markerNo in this._markers) {
@@ -44,44 +45,48 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         for(var markerNo in this._markers) {
             var marker = this._markers[markerNo];
             if(found < 100) {
-                marker._setVisible(bounds.contains(marker.getLatLng()));
+                that._setMarkerVisible(marker, bounds.contains(marker.getLatLng()));
                 if(marker.newPointMarker)
-                    marker.newPointMarker._setVisible(bounds.contains(marker.getLatLng()));
+                    that._setMarkerVisible(marker.newPointMarker, bounds.contains(marker.getLatLng()));
             } else {
-                marker._setVisible(false);
+                that._setMarkerVisible(marker, false);
                 if(marker.newPointMarker)
-                    marker.newPointMarker._setVisible(false);
+                    that._setMarkerVisible(marker.newPointMarker, false);
             }
         }
     },
     /**
      * Prepare marker by adding some utils methods.
      */
-    _prepareMarker: function(marker) {
+    _setMarkerVisible: function(marker, show) {
         if(!marker)
             return;
 
         var map = this._map;
-
-        marker._visible = true;
-        marker._setVisible = function(show) {
-            if(show) {
-                map.addLayer(marker);
-                marker._visible = true;
+        if(show) {
+            if(!marker._map) {
+                marker.addTo(map);
             } else {
-                map.removeLayer(marker);
-                marker._visible = false;
+                map.addLayer(marker);
             }
-        };
+            marker._visible = true;
+            marker._map = map;
+        } else {
+            map.removeLayer(marker);
+            marker._visible = false;
+        }
     },
     /**
      * Add two markers (a point marker and his newPointMarker) for a 
      * single point.
+     *
+     * Markers are not added on the map here, the marker.addTo(map) is called 
+     * only later when needed first time because of performance issues.
      */
     _addMarkers: function(pointNo, latLng, fixNeighbourPositions) {
         var that = this;
         var points = this.getLatLngs();
-        var marker = L.marker(latLng, {draggable: true, icon: pointIcon}).addTo(this._map);
+        var marker = L.marker(latLng, {draggable: true, icon: pointIcon});
 
         marker.newPointMarker = null;
         marker.on('dragend', function(event) {
@@ -95,7 +100,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             var previousPoint = points[pointNo - 1];
             var newPointMarker = L.marker([(latLng.lat + previousPoint.lat) / 2.,
                                            (latLng.lng + previousPoint.lng) / 2.],
-                                          {draggable: true, icon: newPointIcon}).addTo(this._map);
+                                          {draggable: true, icon: newPointIcon});
             marker.newPointMarker = newPointMarker;
             newPointMarker.on('dragend', function(event) {
                 var marker = event.target;
@@ -106,9 +111,6 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         }
 
         this._markers.splice(pointNo, 0, marker);
-
-        this._prepareMarker(marker);
-        this._prepareMarker(marker.newPointMarker);
 
         if(fixNeighbourPositions) {
             this._fixNeighbourPositions(pointNo);
