@@ -4,7 +4,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
      * This function must be explicitly called when the polyline is ready to 
      * be edited.
      */
-    edit: function() {
+    edit: function(options) {
         if(!this._map) {
             alert('Not added to map!');
             return;
@@ -15,6 +15,8 @@ L.Polyline.polylineEditor = L.Polyline.extend({
          * Every marker contains a reference to the newPointMarker 
          * *before* him (=> the first marker has newPointMarker=null).
          */
+        this._parseOptions();
+
         this._markers = [];
         var that = this;
         var points = this.getLatLngs();
@@ -34,6 +36,21 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         });
 
         return this;
+    },
+    _parseOptions: function(options) {
+        if(!options)
+            options = {};
+
+        if(options.pointIcon) {
+            this.pointIcon = options.pointIcon;
+        } else {
+            this.pointIcon = L.icon({ iconUrl: 'editmarker.png', iconSize: [11, 11], iconAnchor: [6, 6], });
+        }
+        if(options.newPointIcon) {
+            this.newPointIcon = options.newPointIcon;
+        } else {
+            this.newPointIcon = L.icon({ iconUrl: 'editmarker2.png', iconSize: [11, 11], iconAnchor: [6, 6], });
+        }
     },
     /**
      * Show only markers in current map bounds *is* there are only a certain 
@@ -95,7 +112,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
     _addMarkers: function(pointNo, latLng, fixNeighbourPositions) {
         var that = this;
         var points = this.getLatLngs();
-        var marker = L.marker(latLng, {draggable: true, icon: pointIcon});
+        var marker = L.marker(latLng, {draggable: true, icon: this.pointIcon});
 
         marker.newPointMarker = null;
         marker.on('dragend', function(event) {
@@ -109,7 +126,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             var previousPoint = points[pointNo - 1];
             var newPointMarker = L.marker([(latLng.lat + previousPoint.lat) / 2.,
                                            (latLng.lng + previousPoint.lng) / 2.],
-                                          {draggable: true, icon: newPointIcon});
+                                          {draggable: true, icon: this.newPointIcon});
             marker.newPointMarker = newPointMarker;
             newPointMarker.on('dragend', function(event) {
                 var marker = event.target;
@@ -170,13 +187,3 @@ L.Polyline.PolylineEditor = function(latlngs, options){
     return new L.Polyline.polylineEditor(latlngs, options);
 };
 
-var pointIcon = L.icon({
-        iconUrl: 'editmarker.png',
-        iconSize: [11, 11],
-        iconAnchor: [6, 6],
-});
-var newPointIcon = L.icon({
-        iconUrl: 'editmarker2.png',
-        iconSize: [11, 11],
-        iconAnchor: [6, 6],
-});
