@@ -122,6 +122,10 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         var marker = L.marker(latLng, {draggable: true, icon: this.pointIcon});
 
         marker.newPointMarker = null;
+        marker.on('dragstart', function(event) {
+            // Busy!
+            console.log('Drag start');
+        });
         marker.on('dragend', function(event) {
             var marker = event.target;
             var pointNo = that._getPointNo(event.target);
@@ -130,7 +134,14 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             that._showBoundMarkers();
         });
         marker.on('contextmenu', function(event) {
-            console.log('rightclick');
+            console.log('rightclick to remove point!');
+        });
+        marker.on('click', function(event) {
+            var marker = event.target;
+            var pointNo = that._getPointNo(event.target);
+            if(pointNo == 0 || pointNo == that._markers.length - 1) {
+                console.log('Click on first or last, add new point');
+            }
         });
 
         if(pointNo > 0) {
@@ -139,6 +150,10 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                                            (latLng.lng + previousPoint.lng) / 2.],
                                           {draggable: true, icon: this.newPointIcon});
             marker.newPointMarker = newPointMarker;
+            newPointMarker.on('dragstart', function(event) {
+                // Busy!
+                console.log('Drag start');
+            });
             newPointMarker.on('dragend', function(event) {
                 var marker = event.target;
                 var pointNo = that._getPointNo(event.target);
