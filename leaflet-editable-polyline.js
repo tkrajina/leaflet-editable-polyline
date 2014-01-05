@@ -15,7 +15,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
          * Every marker contains a reference to the newPointMarker 
          * *before* him (=> the first marker has newPointMarker=null).
          */
-        this._parseOptions();
+        this._parseOptions(options);
 
         this._markers = [];
         var that = this;
@@ -41,6 +41,14 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         if(!options)
             options = {};
 
+        // Do not show edit markers if more than this value woule be shown:
+        if(!('maxMarkers' in options)) {
+            options.maxMarkers = 100;
+        }
+        this.maxMarkers = options.maxMarkers;
+        console.log("maxMarkers=" + this.maxMarkers);
+
+        // Icons:
         if(options.pointIcon) {
             this.pointIcon = options.pointIcon;
         } else {
@@ -70,7 +78,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         console.log("found=" + found);
         for(var markerNo in this._markers) {
             var marker = this._markers[markerNo];
-            if(found < 100) {
+            if(found < that.maxMarkers) {
                 that._setMarkerVisible(marker, bounds.contains(marker.getLatLng()));
                 if(marker.newPointMarker)
                     that._setMarkerVisible(marker.newPointMarker, bounds.contains(marker.getLatLng()));
