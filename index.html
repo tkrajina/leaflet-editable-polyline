@@ -22,7 +22,7 @@
         }).addTo(map2);
 
         var coordinates = [];
-        for(var i = 0; i < 5; i++)
+        for(var i = 0; i < 5000; i++)
             coordinates.push([Math.sin(i / 100), i / 100]);
 
         var polyline = L.Polyline.PolylineEditor(coordinates).addTo(map2).edit();
