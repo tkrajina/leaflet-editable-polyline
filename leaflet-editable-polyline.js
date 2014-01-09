@@ -1,13 +1,17 @@
 L.Polyline.polylineEditor = L.Polyline.extend({
     /**
      * This function must be explicitly called when the polyline is ready to 
-     * be edited.
+     * be edited. 
+     *
+     * If contexts is not null then this is just a shortcut for the contexts 
+     * method.
      */
-    edit: function(options) {
+    edit: function(options, contexts) {
         if(!this._map) {
             alert('Not added to map!');
             return;
         }
+
         /**
          * Since all point editing is done by marker events, markers 
          * will be the main holder of the polyline points locations.
@@ -34,7 +38,37 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             that._showBoundMarkers();
         });
 
+        this.contexts(contexts);
+
         return this;
+    },
+    /**
+     * This is an array of objects that will be kept as "context" for every 
+     * point. Marker will keep this value as marker.context. New markers will 
+     * have context set to null.
+     *
+     * Contexts must be the same size as the polyline size!
+     *
+     * By default, even without calling this method -- every marker will have 
+     * context with one value: marker.context.originalPointNo with the 
+     * original order number of this point. The order may change if some 
+     * markers before this one are delted or new added.
+     */
+    contexts: function(contexts) {
+        if(contexts != null && contexts.length != this._markers.length)
+            throw new Exception('Invalid contexts size (' + contexts.length + '), should be:' + this._markers.length);
+
+        for(var i = 0; i < this._markers.length; i++)
+            this._markers.context = { originalPointNo: i };
+        
+        if(contexts != null) {
+            for(var i = 0; i < contexts.length; i++) {
+                var context = contexts[i];
+                for(var j in context) { // Copy user-defined context properties to marker context:
+                    this._markers[i].context[j] = context[j];
+                }
+            }
+        }
     },
     _parseOptions: function(options) {
         if(!options)
