@@ -12,7 +12,12 @@
 
     <script src="leaflet.js"></script>
     <script src="leaflet-editable-polyline.js"></script>
+    <br/> <br/>
+    <a href="javascript:void(dumpPoints())">Get points</a>
+    <br/> <br/>
+    <textarea id="pointsTextArea" rows="5" cols="70"></textarea>
     <script>
+        "use strict";
 
         var map2 = L.map('map').setView([51.505, -0.09], 13);
 
@@ -22,12 +27,23 @@
         }).addTo(map2);
 
         var coordinates = [];
-        for(var i = 0; i < 5000; i++)
+        for(var i = 0; i < 10; i++)
             coordinates.push([Math.sin(i / 100), i / 100]);
 
         var polyline = L.Polyline.PolylineEditor(coordinates).addTo(map2).edit({maxMarkers: 100});
 
         map2.fitBounds(polyline.getBounds());
+
+        var dumpPoints = function() {
+            var points = polyline.getPoints();
+            var pointsTextArea = document.getElementById('pointsTextArea');
+            for(var i = 0; i < points.length; i++) {
+                var point = points[i];
+                var latLng = point.getLatLng();
+                pointsTextArea.innerHTML += '(' + latLng.lat + ',' + latLng.lng + '), originalPointNo=' + point.context.originalPointNo + '\n';
+            }
+            pointsTextArea.innerHTML += '----------------------------------------------------------------------------------------------------\n';
+        };
 
     </script>
 </body>
