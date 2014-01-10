@@ -12,6 +12,8 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             return;
         }
 
+        this._initialized = false;
+
         /**
          * Since all point editing is done by marker events, markers 
          * will be the main holder of the polyline points locations.
@@ -40,6 +42,8 @@ L.Polyline.polylineEditor = L.Polyline.extend({
 
         this.contexts(contexts);
 
+        this._initialized = true;
+
         return this;
     },
     /**
@@ -58,17 +62,37 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         if(contexts != null && contexts.length != this._markers.length)
             throw new Exception('Invalid contexts size (' + contexts.length + '), should be:' + this._markers.length);
 
-        for(var i = 0; i < this._markers.length; i++)
-            this._markers.context = { originalPointNo: i };
-        
-        if(contexts != null) {
-            for(var i = 0; i < contexts.length; i++) {
-                var context = contexts[i];
-                for(var j in context) { // Copy user-defined context properties to marker context:
-                    this._markers[i].context[j] = context[j];
-                }
+        for(var i = 0; i < this._markers.length; i++) {
+            this._addMarkerContextIfNeeded(this._markers[i], i, contexts == null ? null : contexts[i]);
+        }
+    },
+    /** 
+     * Prepare marker context.
+     * 
+     * pointNo will be ignored if the original polyline was initialized (ie 
+     * this._initialized if true).
+     */
+    _addMarkerContextIfNeeded: function(marker, pointNo, data) {
+        // If we are still initializing the polyline, this is a original 
+        // point, otherwise it is added by the user later:
+        if(!marker.context)
+            marker.context = {};
+
+        if(!this._initialized)
+            marker.context.originalPointNo = pointNo;
+
+        if(data != null) {
+            for(var j in data) { // Copy user-defined context properties to marker context:
+                marker.context[j] = data[j];
             }
         }
+
+    },
+    /**
+     * Get markers for this polyline.
+     */
+    getPoints: function() {
+        return this._markers;
     },
     _parseOptions: function(options) {
         if(!options)
@@ -104,6 +128,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         var found = 0;
         for(var markerNo in this._markers) {
             var marker = this._markers[markerNo];
+            //console.log('marker=', marker);
             if(bounds.contains(marker.getLatLng()))
                 found += 1;
         }
@@ -183,6 +208,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         }
 
         this._markers.splice(pointNo, 0, marker);
+        this._addMarkerContextIfNeeded(marker, pointNo);
 
         if(fixNeighbourPositions) {
             this._fixNeighbourPositions(pointNo);
