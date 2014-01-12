@@ -64,6 +64,8 @@ L.Polyline.polylineEditor = L.Polyline.extend({
 
         for(var i = 0; i < this._markers.length; i++) {
             this._addMarkerContextIfNeeded(this._markers[i], i, contexts == null ? null : contexts[i]);
+
+        return this;
         }
     },
     /** 
