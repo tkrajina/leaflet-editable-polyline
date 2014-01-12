@@ -101,7 +101,6 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                     marker.context[j] = data[j];
                 }
             }
-
         };
 
         /**
@@ -220,6 +219,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 var pointNo = that._getPointNo(event.target);
                 if(pointNo == 0 || pointNo == that._markers.length - 1) {
                     console.log('Click on first or last, add new point');
+                    that._prepareForNewPoint(marker, pointNo);
                 }
             });
 
@@ -248,6 +248,21 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             if(fixNeighbourPositions) {
                 this._fixNeighbourPositions(pointNo);
             }
+        };
+
+        this._prepareForNewPoint = function(marker, pointNo) {
+            var tmpLine = L.polyline([marker.getLatLng(), marker.getLatLng()]).addTo(that._map);
+            var mouseMoveHandler = function(event) {
+                tmpLine.setLatLngs([marker.getLatLng(), event.latlng]);
+            };
+            that._map.on('mousemove', mouseMoveHandler);
+            that._map.on('click', function(event) {
+                that._map.off('mousemove', mouseMoveHandler);
+                that._map.removeLayer(tmpLine);
+                console.log('TODO');
+                that._addMarkers(pointNo, event.latlng, true);
+            });
+            console.log('_prepareForNewPoint(' + marker + ',', pointNo, ')');
         };
 
         /**
