@@ -187,6 +187,16 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             }
         };
 
+        this._hideAll = function(except) {
+            for(var markerNo in this._markers) {
+                var marker = this._markers[markerNo];
+                if(except == null || except != marker)
+                    that._setMarkerVisible(marker, false);
+                if(except == null || except != marker.newPointMarker)
+                    that._setMarkerVisible(marker.newPointMarker, false);
+            }
+        }
+
         /**
          * Show/hide marker.
          */
@@ -224,6 +234,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             marker.newPointMarker = null;
             marker.on('dragstart', function(event) {
                 that._setBusy(true);
+                that._hideAll(marker);
             });
             marker.on('dragend', function(event) {
                 var marker = event.target;
@@ -258,6 +269,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             marker.newPointMarker = newPointMarker;
             newPointMarker.on('dragstart', function(event) {
                 that._setBusy(true);
+                that._hideAll(marker.newPointMarker);
             });
             newPointMarker.on('dragend', function(event) {
                 var marker = event.target;
@@ -277,6 +289,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         };
 
         this._prepareForNewPoint = function(marker, pointNo) {
+            that._hideAll();
             var tmpLine = L.polyline([marker.getLatLng(), marker.getLatLng()]).addTo(that._map);
             var mouseMoveHandler = function(event) {
                 tmpLine.setLatLngs([marker.getLatLng(), event.latlng]);
