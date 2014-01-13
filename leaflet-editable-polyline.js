@@ -55,6 +55,11 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             });
 
             this.contexts(contexts);
+
+            // Container for all editable polylines on this map:
+            if(!('_editablePolylines' in this._map))
+                this._map._editablePolylines = [];
+            this._map._editablePolylines.push(this);
         };
 
         /**
