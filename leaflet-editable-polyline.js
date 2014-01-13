@@ -293,6 +293,12 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 that._showBoundMarkers();
                 that._setBusy(false);
             });
+            newPointMarker.on('contextmenu', function(event) {
+                console.log('TODO: split');
+                // 1. Remove this polyline from map
+                // 2. Create two new polylines with existing contexts
+                // 3. Add polylines to this._map
+            });
 
             this._markers.splice(pointNo, 0, marker);
             this._addMarkerContextIfNeeded(marker, pointNo);
