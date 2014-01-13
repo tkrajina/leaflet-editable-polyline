@@ -224,7 +224,14 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 setBusy(false);
             });
             marker.on('contextmenu', function(event) {
-                //console.log('rightclick to remove point!');
+                var marker = event.target;
+                var pointNo = that._getPointNo(event.target);
+                that._map.removeLayer(marker);
+                that._map.removeLayer(newPointMarker);
+                that._markers.splice(pointNo, 1);
+                that.setLatLngs(that._getMarkerLatLngs());
+                that._fixNeighbourPositions(pointNo);
+                that._showBoundMarkers();
             });
             marker.on('click', function(event) {
                 var marker = event.target;
