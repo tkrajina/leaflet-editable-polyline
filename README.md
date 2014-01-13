@@ -11,9 +11,7 @@ This one should not (when finished :).
 
 ## TODO
 
- * New point on start/end of polyline
- * Split polyline
  * Remove point
  * Split polyline
  * Multiple polylines and consistent points showed
- * Busy for single polyline and all polylines, check busy when moving/adding points
+ * Busy for [single polyline and] all polylines, check busy when moving/adding points
