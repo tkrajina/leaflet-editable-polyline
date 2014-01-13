@@ -14,6 +14,15 @@ L.Polyline.polylineEditor = L.Polyline.extend({
 
         this._addMethods();
 
+        /**
+         * When addint a new point we must disable the user to mess with other 
+         * markers. One way is to check everywhere if the user is busy. The 
+         * other is to just remove other markers when the user is doing 
+         * somethinng.
+         *
+         * TODO: Decide the right way to do this and then leave only _busy or 
+         * _hideAll().
+         */
         this._busy = false;
         this._initialized = false;
 
@@ -187,6 +196,11 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             }
         };
 
+        /**
+         * Used when adding/moving points in order to disable the user to mess 
+         * with other markers (+ easier to decide where to put the point 
+         * without too many markers).
+         */
         this._hideAll = function(except) {
             for(var markerNo in this._markers) {
                 var marker = this._markers[markerNo];
