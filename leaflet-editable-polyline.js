@@ -108,14 +108,25 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         };
 
         /**
+         * Check if there is *any* busy editable polyline on this map.
+         */
+        this.isBusy = function() {
+            for(var i = 0; i < that._map._editablePolylines.length; i++)
+                if(that._map._editablePolylines[i]._isBusy())
+                    return true;
+
+            return false;
+        };
+
+        /**
          * Check if is busy adding/moving new nodes. Note, there may be 
          * *other* editable polylines on the same map which *are* busy.
          */
-        this.isBusy = function() {
+        this._isBusy = function() {
             return that._busy;
         };
 
-        var setBusy = function(busy) {
+        this._setBusy = function(busy) {
             that._busy = busy;
         };
 
@@ -212,7 +223,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
 
             marker.newPointMarker = null;
             marker.on('dragstart', function(event) {
-                setBusy(true);
+                that._setBusy(true);
             });
             marker.on('dragend', function(event) {
                 var marker = event.target;
@@ -220,7 +231,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 that.setLatLngs(that._getMarkerLatLngs());
                 that._fixNeighbourPositions(pointNo);
                 that._showBoundMarkers();
-                setBusy(false);
+                that._setBusy(false);
             });
             marker.on('contextmenu', function(event) {
                 var marker = event.target;
@@ -246,7 +257,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                                           {draggable: true, icon: this.newPointIcon});
             marker.newPointMarker = newPointMarker;
             newPointMarker.on('dragstart', function(event) {
-                setBusy(true);
+                that._setBusy(true);
             });
             newPointMarker.on('dragend', function(event) {
                 var marker = event.target;
@@ -254,7 +265,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 that._addMarkers(pointNo, marker.getLatLng(), true);
                 that.setLatLngs(that._getMarkerLatLngs());
                 that._showBoundMarkers();
-                setBusy(false);
+                that._setBusy(false);
             });
 
             this._markers.splice(pointNo, 0, marker);
@@ -269,7 +280,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             var tmpLine = L.polyline([marker.getLatLng(), marker.getLatLng()]).addTo(that._map);
             var mouseMoveHandler = function(event) {
                 tmpLine.setLatLngs([marker.getLatLng(), event.latlng]);
-                setBusy(true);
+                that._setBusy(true);
             };
             that._map.on('mousemove', mouseMoveHandler);
             that._map.once('click', function(event) {
@@ -278,7 +289,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 that._addMarkers(pointNo, event.latlng, true);
                 that.setLatLngs(that._getMarkerLatLngs());
                 that._showBoundMarkers();
-                setBusy(false);
+                that._setBusy(false);
             });
         };
 
