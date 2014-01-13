@@ -302,6 +302,9 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             }
         };
 
+        /**
+         * Event handlers for first and last point.
+         */
         this._prepareForNewPoint = function(marker, pointNo) {
             that._hideAll();
             var tmpLine = L.polyline([marker.getLatLng(), marker.getLatLng()]).addTo(that._map);
@@ -337,6 +340,9 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             }
         };
 
+        /**
+         * Find the order number of the marker.
+         */
         this._getPointNo = function(marker) {
             for(var i = 0; i < this._markers.length; i++) {
                 if(marker == this._markers[i] || marker == this._markers[i].newPointMarker) {
