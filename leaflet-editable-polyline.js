@@ -48,11 +48,9 @@ L.Polyline.polylineEditor = L.Polyline.extend({
 
             var map = this._map;
             this._map.on("zoomend", function(e) {
-                //console.log("zoom level is " + map.getZoom())
                 that._showBoundMarkers();
             });
             this._map.on("moveend", function(e) {
-                //console.log("zoom level is " + map.getZoom())
                 that._showBoundMarkers();
             });
 
@@ -113,7 +111,6 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         };
 
         var setBusy = function(busy) {
-            //console.log('busy -> ' + busy);
             that._busy = busy;
         };
 
@@ -133,7 +130,6 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 options.maxMarkers = 100;
             }
             this.maxMarkers = options.maxMarkers;
-            //console.log("maxMarkers=" + this.maxMarkers);
 
             // Icons:
             if(options.pointIcon) {
@@ -159,12 +155,10 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             var found = 0;
             for(var markerNo in this._markers) {
                 var marker = this._markers[markerNo];
-                //console.log('marker=', marker);
                 if(bounds.contains(marker.getLatLng()))
                     found += 1;
             }
 
-            //console.log("found=" + found);
             for(var markerNo in this._markers) {
                 var marker = this._markers[markerNo];
                 if(found < that.maxMarkers) {
@@ -237,14 +231,11 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 var marker = event.target;
                 var pointNo = that._getPointNo(event.target);
                 if(pointNo == 0 || pointNo == that._markers.length - 1) {
-                    //console.log('Click on first or last, add new point');
                     that._prepareForNewPoint(marker, pointNo == 0 ? 0 : pointNo + 1);
                 }
             });
 
             var previousPoint = points[pointNo == 0 ? pointNo : pointNo - 1];
-            //console.log('previousPoint=' + previousPoint + ' pointNo=' + pointNo);
-            //console.log('latLng=' + latLng);
             var newPointMarker = L.marker([(latLng.lat + previousPoint.lat) / 2.,
                                            (latLng.lng + previousPoint.lng) / 2.],
                                           {draggable: true, icon: this.newPointIcon});
@@ -284,7 +275,6 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 that._showBoundMarkers();
                 setBusy(false);
             });
-            //console.log('_prepareForNewPoint(' + marker + ',', pointNo, ')');
         };
 
         /**
@@ -307,11 +297,9 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         this._getPointNo = function(marker) {
             for(var i = 0; i < this._markers.length; i++) {
                 if(marker == this._markers[i] || marker == this._markers[i].newPointMarker) {
-                    //console.log("Found:" + i);
                     return i;
                 }
             }
-            //console.log("Nothing found for:" + marker);
             return -1;
         };
 
