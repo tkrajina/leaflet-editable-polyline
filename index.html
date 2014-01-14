@@ -19,20 +19,19 @@
     <script>
         "use strict";
 
-        var map2 = L.map('map').setView([51.505, -0.09], 13);
+        var map = L.map('map').setView([51.505, -0.09], 13);
 
-        L.tileLayer('tile.png', {
-            maxZoom: 18,
-            attribution: '...'
-        }).addTo(map2);
+        var osmUrl='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+        var osmAttrib='Map data © OpenStreetMap contributors';
+        var osm = L.tileLayer(osmUrl, {minZoom: 0, maxZoom: 12, attribution: osmAttrib}).addTo(map);
 
         var coordinates = [];
-        for(var i = 0; i < 10; i++)
-            coordinates.push([Math.sin(i / 100), i / 100]);
+        for(var i = 0; i < 200; i++)
+            coordinates.push([45.3 + Math.sin(i / 100), 13.8 + i / 100]);
 
-        var polyline = L.Polyline.PolylineEditor(coordinates).addTo(map2).edit({maxMarkers: 100});
+        var polyline = L.Polyline.PolylineEditor(coordinates).addTo(map).edit({maxMarkers: 100});
 
-        map2.fitBounds(polyline.getBounds());
+        map.fitBounds(polyline.getBounds());
 
         var dumpPoints = function() {
             var points = polyline.getPoints();
