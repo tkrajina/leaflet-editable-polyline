@@ -220,15 +220,19 @@ L.Polyline.polylineEditor = L.Polyline.extend({
 
             var map = this._map;
             if(show) {
-                if(!marker._map) { // First show fo this marker:
-                    marker.addTo(map);
-                } else { // Marker was already shown and hidden:
-                    map.addLayer(marker);
+                if(!marker._visible) {
+                    if(!marker._map) { // First show fo this marker:
+                        marker.addTo(map);
+                    } else { // Marker was already shown and hidden:
+                        map.addLayer(marker);
+                    }
+                    marker._map = map;
                 }
                 marker._visible = true;
-                marker._map = map;
             } else {
-                map.removeLayer(marker);
+                if(marker._visible) {
+                    map.removeLayer(marker);
+                }
                 marker._visible = false;
             }
         };
