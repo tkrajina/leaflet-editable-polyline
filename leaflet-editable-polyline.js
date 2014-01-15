@@ -237,6 +237,13 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             }
         };
 
+        this._reloadPolyline = function(fixAroundPointNo) {
+            that.setLatLngs(that._getMarkerLatLngs());
+            if(fixAroundPointNo != null)
+                that._fixNeighbourPositions(fixAroundPointNo);
+            that._showBoundMarkers();
+        }
+
         /**
          * Add two markers (a point marker and his newPointMarker) for a 
          * single point.
@@ -257,9 +264,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             marker.on('dragend', function(event) {
                 var marker = event.target;
                 var pointNo = that._getPointNo(event.target);
-                that.setLatLngs(that._getMarkerLatLngs());
-                that._fixNeighbourPositions(pointNo);
-                that._showBoundMarkers();
+                that._reloadPolyline(pointNo);
                 that._setBusy(false);
             });
             marker.on('contextmenu', function(event) {
@@ -268,9 +273,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 that._map.removeLayer(marker);
                 that._map.removeLayer(newPointMarker);
                 that._markers.splice(pointNo, 1);
-                that.setLatLngs(that._getMarkerLatLngs());
-                that._fixNeighbourPositions(pointNo);
-                that._showBoundMarkers();
+                that._reloadPolyline(pointNo);
             });
             marker.on('click', function(event) {
                 var marker = event.target;
@@ -293,8 +296,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 var marker = event.target;
                 var pointNo = that._getPointNo(event.target);
                 that._addMarkers(pointNo, marker.getLatLng(), true);
-                that.setLatLngs(that._getMarkerLatLngs());
-                that._showBoundMarkers();
+                that._reloadPolyline();
                 that._setBusy(false);
             });
             newPointMarker.on('contextmenu', function(event) {
@@ -327,8 +329,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 that._map.off('mousemove', mouseMoveHandler);
                 that._map.removeLayer(tmpLine);
                 that._addMarkers(pointNo, event.latlng, true);
-                that.setLatLngs(that._getMarkerLatLngs());
-                that._showBoundMarkers();
+                that._reloadPolyline();
                 that._setBusy(false);
             });
         };
