@@ -296,28 +296,28 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 console.log('TODO: split');
                 // 1. Remove this polyline from map
                 var marker = event.target;
+                var pointNo = that._getPointNo(marker);
                 var markers = that.getPoints();
                 that._hideAll();
 
-                var secondPartMarkers = that._markers.slice(0, pointNo);
+                var secondPartMarkers = that._markers.slice(pointNo, pointNo.length);
                 that._markers.splice(pointNo, that._markers.length - pointNo);
 
                 that._reloadPolyline();
-                /*
-                var pointNo = that._getPointNo(marker);
-                that._hideAll();
-                var polylineIndex = that._map._editablePolylines.indexOf(that);
-                var newPolyline = L.Polyline.PolylineEditor(markers.slice(pointNo, markers.length))
-                                        .addTo(map)
-                                        .edit({maxMarkers: 100});
-                if(position >= 0) {
-                    this._map._editablePolylines.splice(polylineIndex, 1);
+
+                var points = [];
+                var contexts = [];
+                for(var i = 0; i < secondPartMarkers.length; i++) {
+                    var marker = secondPartMarkers[i];
+                    points.push(marker.getLatLng());
+                    contexts.push(marker.context);
                 }
-                // 2. Create two new polylines with existing contexts
-                // 3. Add polylines to this._map
-                that._map.removeLayer(that);
-                */
-                console.log('Done split')
+
+                console.log('points:' + points);
+                console.log('contexts:' + contexts);
+
+                var newPolyline = L.Polyline.PolylineEditor(points, {maxMarkers: 100}, contexts).addTo(that._map);
+                console.log('Done split, _editablePolylines now:' + that._map._editablePolylines.length);
             });
 
             this._markers.splice(pointNo, 0, marker);
