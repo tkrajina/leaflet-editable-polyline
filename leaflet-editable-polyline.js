@@ -168,23 +168,30 @@ L.Polyline.polylineEditor = L.Polyline.extend({
          * bounds.
          */
         this._showBoundMarkers = function() {
-            var that = this;
-            var bounds = this._map.getBounds();
+            var bounds = that._map.getBounds();
             var found = 0;
-            for(var markerNo in this._markers) {
-                var marker = this._markers[markerNo];
-                if(bounds.contains(marker.getLatLng()))
-                    found += 1;
+            for(var polylineNo in that._map._editablePolylines) {
+                var polyline = that._map._editablePolylines[polylineNo];
+                for(var markerNo in polyline._markers) {
+                    var marker = polyline._markers[markerNo];
+                    if(bounds.contains(marker.getLatLng()))
+                        found += 1;
+                }
             }
 
-            for(var markerNo in this._markers) {
-                var marker = this._markers[markerNo];
-                if(found < that.maxMarkers) {
-                    that._setMarkerVisible(marker, bounds.contains(marker.getLatLng()));
-                    that._setMarkerVisible(marker.newPointMarker, markerNo > 0 && bounds.contains(marker.getLatLng()));
-                } else {
-                    that._setMarkerVisible(marker, false);
-                    that._setMarkerVisible(marker.newPointMarker, false);
+            console.log('found=' + found);
+
+            for(var polylineNo in that._map._editablePolylines) {
+                var polyline = that._map._editablePolylines[polylineNo];
+                for(var markerNo in polyline._markers) {
+                    var marker = polyline._markers[markerNo];
+                    if(found < that.maxMarkers) {
+                        that._setMarkerVisible(marker, bounds.contains(marker.getLatLng()));
+                        that._setMarkerVisible(marker.newPointMarker, markerNo > 0 && bounds.contains(marker.getLatLng()));
+                    } else {
+                        that._setMarkerVisible(marker, false);
+                        that._setMarkerVisible(marker.newPointMarker, false);
+                    }
                 }
             }
         };
@@ -317,6 +324,9 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 console.log('contexts:' + contexts);
 
                 var newPolyline = L.Polyline.PolylineEditor(points, {maxMarkers: 100}, contexts).addTo(that._map);
+
+                that._showBoundMarkers();
+
                 console.log('Done split, _editablePolylines now:' + that._map._editablePolylines.length);
             });
 
