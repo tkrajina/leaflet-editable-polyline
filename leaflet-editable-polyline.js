@@ -1,12 +1,5 @@
 L.Polyline.polylineEditor = L.Polyline.extend({
-    /**
-     * This function must be explicitly called when the polyline is ready to 
-     * be edited. 
-     *
-     * If contexts is not null then this is just a shortcut for the contexts 
-     * method.
-     */
-    edit: function(options, contexts) {
+    _init: function(options, contexts) {
         if(!this._map) {
             alert('Not added to map!');
             return;
@@ -402,11 +395,15 @@ L.Polyline.polylineEditor.addInitHook(function () {
     this.addTo = function(map) {
         this.originalAddTo(map);
         this._map = map;
+        this._init(this._options, this._contexts);
         return this;
     };
 });
 
-L.Polyline.PolylineEditor = function(latlngs, options){
-    return new L.Polyline.polylineEditor(latlngs, options);
+L.Polyline.PolylineEditor = function(latlngs, options, contexts){
+    var result = new L.Polyline.polylineEditor(latlngs, options);
+    result._options = options;
+    result._contexts = contexts;
+    return result;
 };
 

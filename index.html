@@ -29,7 +29,7 @@
         for(var i = 0; i < 200; i++)
             coordinates.push([45.3 + Math.sin(i / 100), 13.8 + i / 100]);
 
-        var polyline = L.Polyline.PolylineEditor(coordinates).addTo(map).edit({maxMarkers: 100});
+        var polyline = L.Polyline.PolylineEditor(coordinates, {maxMarkers: 100}).addTo(map);
 
         map.fitBounds(polyline.getBounds());
 
