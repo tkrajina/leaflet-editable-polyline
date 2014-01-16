@@ -397,7 +397,13 @@ L.Polyline.polylineEditor = L.Polyline.extend({
 });
 
 L.Polyline.polylineEditor.addInitHook(function () {
-    //this._initMarkers();
+    // Hack to keep reference to map:
+    this.originalAddTo = this.addTo;
+    this.addTo = function(map) {
+        this.originalAddTo(map);
+        this._map = map;
+        return this;
+    };
 });
 
 L.Polyline.PolylineEditor = function(latlngs, options){
