@@ -202,12 +202,16 @@ L.Polyline.polylineEditor = L.Polyline.extend({
          * without too many markers).
          */
         this._hideAll = function(except) {
-            for(var markerNo in this._markers) {
-                var marker = this._markers[markerNo];
-                if(except == null || except != marker)
-                    that._setMarkerVisible(marker, false);
-                if(except == null || except != marker.newPointMarker)
-                    that._setMarkerVisible(marker.newPointMarker, false);
+            for(var polylineNo in that._map._editablePolylines) {
+                console.log("hide " + polylineNo + " markers");
+                var polyline = that._map._editablePolylines[polylineNo];
+                for(var markerNo in polyline._markers) {
+                    var marker = polyline._markers[markerNo];
+                    if(except == null || except != marker)
+                        polyline._setMarkerVisible(marker, false);
+                    if(except == null || except != marker.newPointMarker)
+                        polyline._setMarkerVisible(marker.newPointMarker, false);
+                }
             }
         }
 
