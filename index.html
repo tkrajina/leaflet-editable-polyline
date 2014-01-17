@@ -26,7 +26,7 @@
         var osm = L.tileLayer(osmUrl, {minZoom: 0, maxZoom: 12, attribution: osmAttrib}).addTo(map);
 
         var coordinates = [];
-        for(var i = 0; i < 200; i++)
+        for(var i = 0; i < 20; i++)
             coordinates.push([45.3 + Math.sin(i / 100), 13.8 + i / 100]);
 
         var polyline = L.Polyline.PolylineEditor(coordinates, {maxMarkers: 100}).addTo(map);
@@ -34,14 +34,21 @@
         map.fitBounds(polyline.getBounds());
 
         var dumpPoints = function() {
-            var points = polyline.getPoints();
             var pointsTextArea = document.getElementById('pointsTextArea');
-            for(var i = 0; i < points.length; i++) {
-                var point = points[i];
-                var latLng = point.getLatLng();
-                pointsTextArea.innerHTML += '(' + latLng.lat + ',' + latLng.lng + '), originalPointNo=' + point.context.originalPointNo + '\n';
-            }
-            pointsTextArea.innerHTML += '----------------------------------------------------------------------------------------------------\n';
+            pointsTextArea.innerHTML = '';
+            map.getEditablePolylines().forEach(function(polyline) {
+                var points = polyline.getPoints();
+                points.forEach(function(point) {
+                    var latLng = point.getLatLng();
+                    console.log(point.context);
+                    pointsTextArea.innerHTML += 'originalPointNo=' + point.context.originalPointNo
+                                + ' originalPolylineNo=' + point.context.originalPolylineNo
+                                + ' splitted=' + point.context.splitted
+                                + '\n';
+                                //+ ' (' + latLng.lat + ',' + latLng.lng + ')\n';
+                });
+                pointsTextArea.innerHTML += '----------------------------------------------------------------------------------------------------\n';
+            });
         };
 
     </script>

@@ -32,6 +32,21 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         var that = this;
 
         this._init = function(options, contexts) {
+            // Container for all editable polylines on this map:
+            if(!('_editablePolylines' in this._map)) {
+                this._map._editablePolylines = [];
+            }
+
+            /*
+             * Utility method added to this map to retreive editable 
+             * polylines.
+             */
+            if(!this._map.getEditablePolylines) {
+                this._map.getEditablePolylines = function() {
+                    return that._map._editablePolylines;
+                }
+            }
+
             /**
              * Since all point editing is done by marker events, markers 
              * will be the main holder of the polyline points locations.
@@ -56,11 +71,8 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 that._showBoundMarkers();
             });
 
-            this.contexts(contexts);
+            this._setContexts(contexts);
 
-            // Container for all editable polylines on this map:
-            if(!('_editablePolylines' in this._map))
-                this._map._editablePolylines = [];
             this._map._editablePolylines.push(this);
         };
 
@@ -76,7 +88,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
          * original order number of this point. The order may change if some 
          * markers before this one are delted or new added.
          */
-        this.contexts = function(contexts) {
+        this._setContexts = function(contexts) {
             if(contexts != null && contexts.length != this._markers.length)
                 throw new Exception('Invalid contexts size (' + contexts.length + '), should be:' + this._markers.length);
 
@@ -99,8 +111,20 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             if(!marker.context)
                 marker.context = {};
 
-            if(!this._initialized)
-                marker.context.originalPointNo = pointNo;
+            if(!this._initialized) {
+                // If this marker is part of a splitted polyline then it 
+                // already (probably!) have a originalPointNo and 
+                // originalPolylineNo:
+                if(!marker.context.splitted) {
+                    marker.context.originalPointNo = pointNo;
+                    marker.context.originalPolylineNo = that._map._editablePolylines.length;
+                }
+            }
+
+            if(!('originalPointNo' in marker.context))
+                marker.context.originalPointNo = null;
+            if(!('originalPolylineNo' in marker.context))
+                marker.context.originalPolylineNo = null;
 
             if(data != null) {
                 for(var j in data) { // Copy user-defined context properties to marker context:
@@ -321,13 +345,17 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 for(var i = 0; i < secondPartMarkers.length; i++) {
                     var marker = secondPartMarkers[i];
                     points.push(marker.getLatLng());
+                    // Later we need to know that this marker is from a 
+                    // splitted polyline:
+                    marker.context.splitted = true;
                     contexts.push(marker.context);
                 }
 
                 console.log('points:' + points);
                 console.log('contexts:' + contexts);
 
-                var newPolyline = L.Polyline.PolylineEditor(points, that._options, contexts).addTo(that._map);
+                var newPolyline = L.Polyline.PolylineEditor(points, that._options, contexts)
+                                            .addTo(that._map);
 
                 that._showBoundMarkers();
 
@@ -414,10 +442,18 @@ L.Polyline.polylineEditor.addInitHook(function () {
     };
 });
 
+/**
+ * Construct a new editable polyline.
+ *
+ * latlngs  ... a list of points (or two-element tuples with coordinates)
+ * options  ... polyline options
+ * contexts ... custom contexts for every point in the polyline. Must have the 
+ *              same number of elements as latlngs and this data will be 
+ *              preserved when new points are added or polylines splitted.
+ */
 L.Polyline.PolylineEditor = function(latlngs, options, contexts){
     var result = new L.Polyline.polylineEditor(latlngs, options);
     result._options = options;
     result._contexts = contexts;
     return result;
 };
-
