@@ -323,7 +323,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 console.log('points:' + points);
                 console.log('contexts:' + contexts);
 
-                var newPolyline = L.Polyline.PolylineEditor(points, {maxMarkers: 100}, contexts).addTo(that._map);
+                var newPolyline = L.Polyline.PolylineEditor(points, that._options, contexts).addTo(that._map);
 
                 that._showBoundMarkers();
 
