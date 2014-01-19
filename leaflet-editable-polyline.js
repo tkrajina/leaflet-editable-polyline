@@ -34,7 +34,13 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             var points = this.getLatLngs();
             var length = points.length;
             for(var i = 0; i < length; i++) {
-                this._addMarkers(i, points[i]);
+                var marker = this._addMarkers(i, points[i]);
+                marker.context = that._contexts == null ? {} : contexts[i];
+
+                if(! ('originalPointNo' in marker.context))
+                    marker.context.originalPointNo = i;
+                if(! ('originalPolylineNo' in marker.context))
+                    marker.context.originalPolylineNo = that._map._editablePolylines.length;
             }
 
             var map = this._map;
@@ -45,66 +51,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 that._showBoundMarkers();
             });
 
-            this._setContexts(contexts);
-
             this._map._editablePolylines.push(this);
-        };
-
-        /**
-         * This is an array of objects that will be kept as "context" for every 
-         * point. Marker will keep this value as marker.context. New markers will 
-         * have context set to null.
-         *
-         * Contexts must be the same size as the polyline size!
-         *
-         * By default, even without calling this method -- every marker will have 
-         * context with one value: marker.context.originalPointNo with the 
-         * original order number of this point. The order may change if some 
-         * markers before this one are delted or new added.
-         */
-        this._setContexts = function(contexts) {
-            if(contexts != null && contexts.length != this._markers.length)
-                throw new Exception('Invalid contexts size (' + contexts.length + '), should be:' + this._markers.length);
-
-            for(var i = 0; i < this._markers.length; i++) {
-                this._addMarkerContextIfNeeded(this._markers[i], i, contexts == null ? null : contexts[i]);
-
-            return this;
-            }
-        };
-
-        /** 
-         * Prepare marker context.
-         * 
-         * pointNo will be ignored if the original polyline was initialized (ie 
-         * this._initialized if true).
-         */
-        this._addMarkerContextIfNeeded = function(marker, pointNo, data) {
-            // If we are still initializing the polyline, this is a original 
-            // point, otherwise it is added by the user later:
-            if(!marker.context)
-                marker.context = {};
-
-            if(!this._initialized) {
-                // If this marker is part of a splitted polyline then it 
-                // already (probably!) have a originalPointNo and 
-                // originalPolylineNo:
-                if(!marker.context.splitted) {
-                    marker.context.originalPointNo = pointNo;
-                    marker.context.originalPolylineNo = that._map._editablePolylines.length;
-                }
-            }
-
-            if(!('originalPointNo' in marker.context))
-                marker.context.originalPointNo = null;
-            if(!('originalPolylineNo' in marker.context))
-                marker.context.originalPolylineNo = null;
-
-            if(data != null) {
-                for(var j in data) { // Copy user-defined context properties to marker context:
-                    marker.context[j] = data[j];
-                }
-            }
         };
 
         /**
@@ -258,6 +205,8 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             var points = this.getLatLngs();
             var marker = L.marker(latLng, {draggable: true, icon: this.pointIcon});
 
+            marker.context = null;
+
             marker.newPointMarker = null;
             marker.on('dragstart', function(event) {
                 that._setBusy(true);
@@ -337,11 +286,12 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             });
 
             this._markers.splice(pointNo, 0, marker);
-            this._addMarkerContextIfNeeded(marker, pointNo);
 
             if(fixNeighbourPositions) {
                 this._fixNeighbourPositions(pointNo);
             }
+
+            return marker;
         };
 
         /**
@@ -442,6 +392,18 @@ L.Polyline.polylineEditor.addInitHook(function () {
  * contexts ... custom contexts for every point in the polyline. Must have the 
  *              same number of elements as latlngs and this data will be 
  *              preserved when new points are added or polylines splitted.
+ *
+ * TODO: contexts:
+ * This is an array of objects that will be kept as "context" for every 
+ * point. Marker will keep this value as marker.context. New markers will 
+ * have context set to null.
+ *
+ * Contexts must be the same size as the polyline size!
+ *
+ * By default, even without calling this method -- every marker will have 
+ * context with one value: marker.context.originalPointNo with the 
+ * original order number of this point. The order may change if some 
+ * markers before this one are delted or new added.
  */
 L.Polyline.PolylineEditor = function(latlngs, options, contexts){
     var result = new L.Polyline.polylineEditor(latlngs, options);
