@@ -21,9 +21,12 @@
 
         var map = L.map('map').setView([51.505, -0.09], 13);
 
+        L.tileLayer('tile.png', { maxZoom: 18, attribution: '...' }).addTo(map);
+        /*
         var osmUrl='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
         var osmAttrib='Map data © OpenStreetMap contributors';
-        var osm = L.tileLayer(osmUrl, {minZoom: 0, maxZoom: 12, attribution: osmAttrib}).addTo(map);
+        L.tileLayer(osmUrl, {minZoom: 0, maxZoom: 12, attribution: osmAttrib}).addTo(map);
+        */
 
         var coordinates = [];
         for(var i = 0; i < 20; i++)
