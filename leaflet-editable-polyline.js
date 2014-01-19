@@ -352,6 +352,30 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 result.push(this._markers[i].getLatLng());
             return result;
         };
+
+        this._setupDragLines = function(marker, point1, point2) {
+            var line1 = null;
+            var line2 = null;
+            if(point1) line1 = L.polyline([marker.getLatLng(), point1]).addTo(that._map);
+            if(point2) line2 = L.polyline([marker.getLatLng(), point1]).addTo(that._map);
+
+            var moveHandler = function(event) {
+                if(line1)
+                    line1.setLatLngs([event.latLng, point1]);
+                if(line2)
+                    line2.setLatLngs([event.latLng, point2]);
+            };
+
+            var stopHandler = function(event) {
+                marker.off('drag', moveHandler);
+                marker.off('click', stopHandler);
+                marker.off('dragend', stopHandler);
+            };
+
+            marker.on('drag', moveHandler);
+            marker.on('click', stopHandler);
+            marker.on('dragend', stopHandler);
+        }
     }
 });
 
