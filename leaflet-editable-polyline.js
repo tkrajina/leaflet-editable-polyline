@@ -373,8 +373,10 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         this._setupDragLines = function(marker, point1, point2) {
             var line1 = null;
             var line2 = null;
-            if(point1) line1 = L.polyline([marker.getLatLng(), point1]).addTo(that._map);
-            if(point2) line2 = L.polyline([marker.getLatLng(), point1]).addTo(that._map);
+            if(point1) line1 = L.polyline([marker.getLatLng(), point1], {dasharray: "5,1", weight: 1})
+                                .addTo(that._map);
+            if(point2) line2 = L.polyline([marker.getLatLng(), point1], {dasharray: "5,1", weight: 1})
+                                .addTo(that._map);
 
             var moveHandler = function(event) {
                 if(line1)
