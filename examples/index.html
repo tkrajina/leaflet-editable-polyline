@@ -4,14 +4,13 @@
     <title>Editable polyline: work in progress</title>
     <meta charset="utf-8" />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="leaflet.css" />
+    <script src="leaflet.js"></script>
+    <script src="leaflet-editable-polyline.js"></script>
 </head>
 <body>
     <div id="map" style="width: 400px; height: 300px"></div>
 
-    <script src="leaflet.js"></script>
-    <script src="leaflet-editable-polyline.js"></script>
     <br/> <br/>
     <a href="javascript:void(dumpPoints())">Get points</a>
     <br/> <br/>
@@ -21,12 +20,12 @@
 
         var map = L.map('map').setView([51.505, -0.09], 13);
 
-        L.tileLayer('tile.png', { maxZoom: 18, attribution: '...' }).addTo(map);
         /*
+        L.tileLayer('tile.png', { maxZoom: 18, attribution: '...' }).addTo(map);
+        */
         var osmUrl='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
         var osmAttrib='Map data © OpenStreetMap contributors';
         L.tileLayer(osmUrl, {minZoom: 0, maxZoom: 12, attribution: osmAttrib}).addTo(map);
-        */
 
         var coordinates = [];
         for(var i = 0; i < 20; i++)
@@ -44,11 +43,10 @@
                 points.forEach(function(point) {
                     var latLng = point.getLatLng();
                     console.log(point.context);
-                    pointsTextArea.innerHTML += 'originalPointNo=' + point.context.originalPointNo
-                                + ' originalPolylineNo=' + point.context.originalPolylineNo
-                                + ' splitted=' + point.context.splitted
+                    pointsTextArea.innerHTML += 'originalPointNo=' + (point.context ? point.context.originalPointNo : null)
+                                + ' originalPolylineNo=' + (point.context ? point.context.originalPolylineNo : null)
+                                + ' (' + latLng.lat + ',' + latLng.lng + ')\n';
                                 + '\n';
-                                //+ ' (' + latLng.lat + ',' + latLng.lng + ')\n';
                 });
                 pointsTextArea.innerHTML += '----------------------------------------------------------------------------------------------------\n';
             });

@@ -1,5 +1,6 @@
 tags
 *.swp
 *.swo
-leaflet.css
-leaflet.js
+examples/leaflet.css
+examples/leaflet.js
+examples/leaflet-editable-polyline.js
