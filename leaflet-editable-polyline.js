@@ -37,9 +37,9 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 var marker = this._addMarkers(i, points[i]);
                 marker.context = that._contexts == null ? {} : contexts[i];
 
-                if(! ('originalPointNo' in marker.context))
+                if(marker.context && ! ('originalPointNo' in marker.context))
                     marker.context.originalPointNo = i;
-                if(! ('originalPolylineNo' in marker.context))
+                if(marker.context && ! ('originalPolylineNo' in marker.context))
                     marker.context.originalPolylineNo = that._map._editablePolylines.length;
             }
 
@@ -286,9 +286,6 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 for(var i = 0; i < secondPartMarkers.length; i++) {
                     var marker = secondPartMarkers[i];
                     points.push(marker.getLatLng());
-                    // Later we need to know that this marker is from a 
-                    // splitted polyline:
-                    marker.context.splitted = true;
                     contexts.push(marker.context);
                 }
 
