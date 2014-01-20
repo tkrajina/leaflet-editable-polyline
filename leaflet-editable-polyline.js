@@ -113,6 +113,11 @@ L.Polyline.polylineEditor = L.Polyline.extend({
          * bounds.
          */
         this._showBoundMarkers = function() {
+            if(that.isBusy()) {
+                console.log('Do not show because busy!');
+                return;
+            }
+
             var bounds = that._map.getBounds();
             var found = 0;
             for(var polylineNo in that._map._editablePolylines) {
@@ -186,6 +191,10 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             }
         };
 
+        /**
+         * Reload polyline. If it is busy, then the bound markers will not be 
+         * shown. Call _setBusy(false) before this method!
+         */
         this._reloadPolyline = function(fixAroundPointNo) {
             that.setLatLngs(that._getMarkerLatLngs());
             if(fixAroundPointNo != null)
@@ -215,8 +224,8 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             marker.on('dragend', function(event) {
                 var marker = event.target;
                 var pointNo = that._getPointNo(event.target);
-                that._reloadPolyline(pointNo);
                 that._setBusy(false);
+                that._reloadPolyline(pointNo);
             });
             marker.on('contextmenu', function(event) {
                 var marker = event.target;
@@ -247,8 +256,8 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 var marker = event.target;
                 var pointNo = that._getPointNo(event.target);
                 that._addMarkers(pointNo, marker.getLatLng(), true);
-                that._reloadPolyline();
                 that._setBusy(false);
+                that._reloadPolyline();
             });
             newPointMarker.on('contextmenu', function(event) {
                 console.log('TODO: split');
@@ -299,18 +308,17 @@ L.Polyline.polylineEditor = L.Polyline.extend({
          */
         this._prepareForNewPoint = function(marker, pointNo) {
             that._hideAll();
-            var tmpLine = L.polyline([marker.getLatLng(), marker.getLatLng()]).addTo(that._map);
+            that._setupDragLines(marker, marker.getLatLng());
             var mouseMoveHandler = function(event) {
-                tmpLine.setLatLngs([marker.getLatLng(), event.latlng]);
                 that._setBusy(true);
             };
             that._map.on('mousemove', mouseMoveHandler);
             that._map.once('click', function(event) {
+                console.log('dodajemo na ' + pointNo + ' - ' + event.latlng);
                 that._map.off('mousemove', mouseMoveHandler);
-                that._map.removeLayer(tmpLine);
                 that._addMarkers(pointNo, event.latlng, true);
-                that._reloadPolyline();
                 that._setBusy(false);
+                that._reloadPolyline();
             });
         };
 
@@ -361,20 +369,29 @@ L.Polyline.polylineEditor = L.Polyline.extend({
 
             var moveHandler = function(event) {
                 if(line1)
-                    line1.setLatLngs([event.latLng, point1]);
+                    line1.setLatLngs([event.latlng, point1]);
                 if(line2)
-                    line2.setLatLngs([event.latLng, point2]);
+                    line2.setLatLngs([event.latlng, point2]);
             };
 
             var stopHandler = function(event) {
-                marker.off('drag', moveHandler);
-                marker.off('click', stopHandler);
+                that._map.off('mousemove', moveHandler);
                 marker.off('dragend', stopHandler);
+                if(line1) that._map.removeLayer(line1);
+                if(line2) that._map.removeLayer(line2);
+                console.log('STOPPED');
+                if(event.target != that._map) {
+                    that._map.fire('click', event);
+                }
             };
 
-            marker.on('drag', moveHandler);
-            marker.on('click', stopHandler);
+            that._map.on('mousemove', moveHandler);
             marker.on('dragend', stopHandler);
+
+            that._map.once('click', stopHandler);
+            marker.once('click', stopHandler);
+            if(line1) line1.once('click', stopHandler);
+            if(line2) line2.once('click', stopHandler);
         }
     }
 });
