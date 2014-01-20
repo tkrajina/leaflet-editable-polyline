@@ -218,6 +218,10 @@ L.Polyline.polylineEditor = L.Polyline.extend({
 
             marker.newPointMarker = null;
             marker.on('dragstart', function(event) {
+                var pointNo = that._getPointNo(event.target);
+                var previousPoint = pointNo == null ? null : that._markers[pointNo - 1].getLatLng();
+                var nextPoint = pointNo < that._markers.length - 1 ? that._markers[pointNo + 1].getLatLng() : null;
+                that._setupDragLines(marker, previousPoint, nextPoint);
                 that._setBusy(true);
                 that._hideAll(marker);
             });
@@ -249,6 +253,11 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                                           {draggable: true, icon: this.newPointIcon});
             marker.newPointMarker = newPointMarker;
             newPointMarker.on('dragstart', function(event) {
+                var pointNo = that._getPointNo(event.target);
+                var previousPoint = that._markers[pointNo - 1].getLatLng();
+                var nextPoint = that._markers[pointNo].getLatLng();
+                that._setupDragLines(marker.newPointMarker, previousPoint, nextPoint);
+
                 that._setBusy(true);
                 that._hideAll(marker.newPointMarker);
             });
