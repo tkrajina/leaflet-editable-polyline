@@ -5,6 +5,7 @@
 ## Why
 
 Most editable polylines have performance problems on bigger polylines because of too many markers shown on a map.
+This Leaflet polyline plugin will show editable markers only for a selected part of the map.
 
 ## Examples
 
@@ -57,8 +58,8 @@ When the editing is done, you can retrieve all points with:
         }
     }
 
-The **contexts** object-like variable may be an array (same length as coordinates).
-Values from the contexts will be stored with all the points (as they are moved, polylines splitted or new points added) and can be retrieved later with point.context.
+The **contexts** object-like variable may be an array (same length as coordinates!).
+Values from the contexts will be stored with every point and can be retrieved later with point.context.
 
 You can add as many editable polylines as you need. 
 The resulting polylines can be retrieved with:
