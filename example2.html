@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Editable polyline: work in progress</title>
+    <meta charset="utf-8" />
+
+    <link rel="stylesheet" href="leaflet.css" />
+    <script src="leaflet.js"></script>
+    <script src="leaflet-editable-polyline.js"></script>
+</head>
+<body>
+    <div id="map" style="width: 400px; height: 300px"></div>
+
+    <hr>
+
+    <a href='https://github.com/tkrajina/leaflet-editable-polyline/'>README</a>
+
+    <script>
+        "use strict";
+
+        var map = L.map('map').setView([51.505, -0.09], 13);
+
+        /*
+        L.tileLayer('tile.png', { maxZoom: 18, attribution: '...' }).addTo(map);
+        */
+        var osmUrl='http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+        var osmAttrib='Map data © OpenStreetMap contributors';
+        L.tileLayer(osmUrl, {minZoom: 0, maxZoom: 12, attribution: osmAttrib}).addTo(map);
+
+        var coordinates = [];
+        for(var i = 0; i < 20000; i++)
+            coordinates.push([45.3 + Math.sin(i / 100), 13.8 + i / 100]);
+
+        var polyline = L.Polyline.PolylineEditor(coordinates, {maxMarkers: 100}).addTo(map);
+
+        map.fitBounds(polyline.getBounds());
+    </script>
+</body>
+</html>
