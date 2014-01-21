@@ -57,6 +57,11 @@ When the editing is done, you can retrieve all points with:
 The **contexts** object-like variable may be an array (same length as coordinates).
 Values from the contexts will be stored with all the points (as they are moved, polylines splitted or new points added) and can be retrieved later with point.context.
 
+You can add as many editable polylines as you need. 
+The resulting polylines can be retrieved with:
+
+    var polylines = map.getEditablePolylines()
+
 ## License
 
 GPX.py is licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
