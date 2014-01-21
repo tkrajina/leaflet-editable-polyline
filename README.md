@@ -1,8 +1,6 @@
-# Work in progress
+# Leaflet.js Editable Polylines plugin
 
-Leaflet editable polyline.
-
-This is still a work in progress (but I hope a first release is comming soon). 
+**Work in progress**
 
 ## Why
 
