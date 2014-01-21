@@ -13,6 +13,6 @@ github-pages: prepare-examples
 	git checkout -b gh-pages
 	rm .gitignore
 	mv examples/* .
-	add .
+	git add .
 	git commit -m "gh-pages"
 	git checkout master
