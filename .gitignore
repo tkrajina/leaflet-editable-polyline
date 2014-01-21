@@ -4,3 +4,4 @@ tags
 examples/leaflet.css
 examples/leaflet.js
 examples/leaflet-editable-polyline.js
+dist/*

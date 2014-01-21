@@ -1,5 +1,11 @@
 GIT_PORCELAIN_STATUS=$(shell git status --porcelain)
+VERSION=$(shell head -1 VERSION)
 
+build: clean prepare-examples
+	mkdir dist
+	yui-compressor src/leaflet-editable-polyline.js > "dist/leaflet-editable-polyline-$(VERSION).js"
+clean:
+	rm -Rf dist
 get-leaflet-dist:
 	# Will retrieve leaflet files if needed:
 	test -f examples/leaflet.css || wget http://leafletjs.com/dist/leaflet.css -O examples/leaflet.css
