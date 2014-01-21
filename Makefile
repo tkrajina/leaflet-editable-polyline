@@ -20,10 +20,12 @@ github-pages: check-all-commited prepare-examples
 	git branch -D gh-pages
 	git checkout -b gh-pages
 	rm .gitignore
-	mv examples/* .
+	cp examples/* .
 	git add .
 	git commit -m "gh-pages"
 	git checkout master
+	git clean -f
+	git checkout -- .
 check-all-commited:
 	if [ -n "$(GIT_PORCELAIN_STATUS)" ]; \
 	then \
