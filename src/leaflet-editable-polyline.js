@@ -35,7 +35,12 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             var length = points.length;
             for(var i = 0; i < length; i++) {
                 var marker = this._addMarkers(i, points[i]);
-                marker.context = that._contexts == null ? {} : contexts[i];
+                if(! ('context' in marker)) {
+                    marker.context = {}
+                    if(that._contexts != null) {
+                        marker.context = contexts[i];
+                    }
+                }
 
                 if(marker.context && ! ('originalPointNo' in marker.context))
                     marker.context.originalPointNo = i;
@@ -213,8 +218,6 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             var that = this;
             var points = this.getLatLngs();
             var marker = L.marker(latLng, {draggable: true, icon: this.pointIcon});
-
-            marker.context = null;
 
             marker.newPointMarker = null;
             marker.on('dragstart', function(event) {
@@ -442,7 +445,7 @@ L.Polyline.polylineEditor.addInitHook(function () {
  *              same number of elements as latlngs and this data will be 
  *              preserved when new points are added or polylines splitted.
  *
- * TODO: contexts:
+ * More about contexts:
  * This is an array of objects that will be kept as "context" for every 
  * point. Marker will keep this value as marker.context. New markers will 
  * have context set to null.
