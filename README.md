@@ -5,7 +5,7 @@
 ## Why
 
 Most editable polylines have performance problems on bigger polylines because of too many markers shown on a map.
-This Leaflet polyline plugin will show editable markers only for a selected part of the map.
+This Leaflet plugin will show editable markers only for a selected part of the map and only if no more than specified number of points are shown.
 
 ## Examples
 
@@ -36,7 +36,7 @@ Options is a normal Leaflet polyline options object with some additions:
  * **pointIcon** icon to be shown for point markers.
  * **newPointIcon** icon to be shown for middle point markers (markers used when creating new points).
 
-The editing can be done by:
+The editing can be done with:
 
  * **drag the point marker** to move it around
  * **right-click on point marker** to __remove__ the point
