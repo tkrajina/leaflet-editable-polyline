@@ -56,7 +56,11 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 that._showBoundMarkers();
             });
 
-            this._map._editablePolylines.push(this);
+            if('_desiredPolylineNo' in this) {
+                this._map._editablePolylines.splice(this._desiredPolylineNo, 0, this);
+            } else {
+                this._map._editablePolylines.push(this);
+            }
         };
 
         /**
@@ -272,7 +276,6 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 that._reloadPolyline();
             });
             newPointMarker.on('contextmenu', function(event) {
-                console.log('TODO: split');
                 // 1. Remove this polyline from map
                 var marker = event.target;
                 var pointNo = that._getPointNo(marker);
@@ -295,7 +298,11 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 console.log('points:' + points);
                 console.log('contexts:' + contexts);
 
-                var newPolyline = L.Polyline.PolylineEditor(points, that._options, contexts)
+                // Need to know the current polyline order numbers, because 
+                // the splitted one need to be inserted immediately after:
+                var originalPolylineNo = that._map._editablePolylines.indexOf(that);
+
+                var newPolyline = L.Polyline.PolylineEditor(points, that._options, contexts, originalPolylineNo + 1)
                                             .addTo(that._map);
 
                 that._showBoundMarkers();
@@ -439,11 +446,12 @@ L.Polyline.polylineEditor.addInitHook(function () {
 /**
  * Construct a new editable polyline.
  *
- * latlngs  ... a list of points (or two-element tuples with coordinates)
- * options  ... polyline options
- * contexts ... custom contexts for every point in the polyline. Must have the 
- *              same number of elements as latlngs and this data will be 
- *              preserved when new points are added or polylines splitted.
+ * latlngs    ... a list of points (or two-element tuples with coordinates)
+ * options    ... polyline options
+ * contexts   ... custom contexts for every point in the polyline. Must have the 
+ *                same number of elements as latlngs and this data will be 
+ *                preserved when new points are added or polylines splitted.
+ * polylineNo ... insert this polyline in a specific order (used when splitting).
  *
  * More about contexts:
  * This is an array of objects that will be kept as "context" for every 
@@ -457,9 +465,10 @@ L.Polyline.polylineEditor.addInitHook(function () {
  * original order number of this point. The order may change if some 
  * markers before this one are delted or new added.
  */
-L.Polyline.PolylineEditor = function(latlngs, options, contexts){
+L.Polyline.PolylineEditor = function(latlngs, options, contexts, polylineNo) {
     var result = new L.Polyline.polylineEditor(latlngs, options);
     result._options = options;
     result._contexts = contexts;
+    result._desiredPolylineNo = polylineNo
     return result;
 };
