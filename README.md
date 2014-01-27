@@ -68,5 +68,5 @@ The resulting polylines can be retrieved with:
 
 ## License
 
-GPX.py is licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
+Leaflet.Editable.Polyline is licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 
