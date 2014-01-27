@@ -58,7 +58,7 @@ When the editing is done, you can retrieve all points with:
         }
     }
 
-The **contexts** object-like variable may be an array (same length as coordinates!).
+The **contexts** can be *null* or an array of objects.
 Values from the contexts will be stored with every point and can be retrieved later with point.context.
 
 You can add as many editable polylines as you need. 
