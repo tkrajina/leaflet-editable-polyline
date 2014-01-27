@@ -1,7 +1,7 @@
 GIT_PORCELAIN_STATUS=$(shell git status --porcelain)
 VERSION=$(shell head -1 VERSION)
 
-build: clean prepare-examples
+build: clean
 	mkdir dist
 	yui-compressor src/leaflet-editable-polyline.js > "dist/leaflet-editable-polyline-$(VERSION).js"
 clean:
@@ -10,13 +10,11 @@ get-leaflet-dist:
 	# Will retrieve leaflet files if needed:
 	test -f examples/leaflet.css || wget http://leafletjs.com/dist/leaflet.css -O examples/leaflet.css
 	test -f examples/leaflet.js || wget http://leafletjs.com/dist/leaflet.js -O examples/leaflet.js
-prepare-examples: get-leaflet-dist
-	cp src/*.js examples/
-show-chromium: prepare-examples
+show-chromium:
 	chromium-browser examples/index.html
-show-firefox: prepare-examples
+show-firefox:
 	firefox examples/index.html
-github-pages: check-all-commited prepare-examples
+github-pages: check-all-commited
 	git branch -D gh-pages
 	git checkout -b gh-pages
 	rm .gitignore
