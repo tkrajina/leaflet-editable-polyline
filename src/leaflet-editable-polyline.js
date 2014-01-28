@@ -107,12 +107,12 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             if(options.pointIcon) {
                 this.pointIcon = options.pointIcon;
             } else {
-                this.pointIcon = L.icon({ iconUrl: 'editmarker.png', iconSize: [11, 11], iconAnchor: [6, 6], });
+                this.pointIcon = L.icon({ iconUrl: 'editmarker.png', iconSize: [11, 11], iconAnchor: [6, 6] });
             }
             if(options.newPointIcon) {
                 this.newPointIcon = options.newPointIcon;
             } else {
-                this.newPointIcon = L.icon({ iconUrl: 'editmarker2.png', iconSize: [11, 11], iconAnchor: [6, 6], });
+                this.newPointIcon = L.icon({ iconUrl: 'editmarker2.png', iconSize: [11, 11], iconAnchor: [6, 6] });
             }
         };
 
