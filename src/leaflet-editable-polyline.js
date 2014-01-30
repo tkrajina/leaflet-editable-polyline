@@ -56,7 +56,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 that._showBoundMarkers();
             });
 
-            if('_desiredPolylineNo' in this) {
+            if(this._desiredPolylineNo && this._desiredPolylineNo != null) {
                 this._map._editablePolylines.splice(this._desiredPolylineNo, 0, this);
             } else {
                 this._map._editablePolylines.push(this);
