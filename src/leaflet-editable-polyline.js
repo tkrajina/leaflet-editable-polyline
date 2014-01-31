@@ -47,6 +47,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                     marker.context.originalPolylineNo = that._map._editablePolylines.length;
             }
 
+            // Map move => show different editable markers:
             var map = this._map;
             this._map.on("zoomend", function(e) {
                 that._showBoundMarkers();
@@ -54,6 +55,29 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             this._map.on("moveend", function(e) {
                 that._showBoundMarkers();
             });
+
+            // Click anywhere on map to add a new point-polyline:
+            if(this._options.newPolylines) {
+                console.log('click na map');
+                that._map.on('click', function(event) {
+                    if(that._isBusy())
+                        return;
+
+                    that._setBusy(true);
+
+                    var latLng = event.latlng;
+                    if(that._options.newPolylineConfirmMessage)
+                        if(!confirm(that._options.newPolylineConfirmMessage))
+                            return
+
+                    var contexts = [{'originalPolylineNo': null, 'originalPointNo': null}];
+                    L.Polyline.PolylineEditor([latLng], that._options, contexts).addTo(that._map);
+
+                    that._setBusy(false);
+
+                    that._showBoundMarkers();
+                });
+            }
 
             if(this._desiredPolylineNo && this._desiredPolylineNo != null) {
                 this._map._editablePolylines.splice(this._desiredPolylineNo, 0, this);
@@ -99,6 +123,10 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             // Do not show edit markers if more than maxMarkers would be shown:
             if(!('maxMarkers' in options))
                 options.maxMarkers = 100;
+            if(!('newPolylines' in options))
+                options.newPolylines = false;
+            if(!('newPolylineConfirmMessage' in options))
+                options.newPolylineConfirmMessage = '';
 
             this._options = options;
 

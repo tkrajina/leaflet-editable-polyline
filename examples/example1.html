@@ -55,7 +55,15 @@
                 [45.2756791761, 13.7202823162]
         ];
 
-        var polyline = L.Polyline.PolylineEditor(coordinates, {maxMarkers: 100}).addTo(map);
+        var polylineOptions = {
+                // The user can add new polylines by clicking anywhere on the map:
+                newPolylines: true,
+                newPolylineConfirmMessage: 'Add a new polyline here?',
+                // Show editable markers only if less than this number are in map bounds:
+                maxMarkers: 100
+        }
+
+        var polyline = L.Polyline.PolylineEditor(coordinates, polylineOptions).addTo(map);
 
         map.fitBounds(polyline.getBounds());
 
