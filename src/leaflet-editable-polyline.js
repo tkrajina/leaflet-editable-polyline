@@ -30,7 +30,6 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             this._parseOptions(options);
 
             this._markers = [];
-            var that = this;
             var points = this.getLatLngs();
             var length = points.length;
             for(var i = 0; i < length; i++) {
@@ -98,22 +97,16 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 options = {};
 
             // Do not show edit markers if more than maxMarkers would be shown:
-            if(!('maxMarkers' in options)) {
+            if(!('maxMarkers' in options))
                 options.maxMarkers = 100;
-            }
-            this.maxMarkers = options.maxMarkers;
+
+            this._options = options;
 
             // Icons:
-            if(options.pointIcon) {
-                this.pointIcon = options.pointIcon;
-            } else {
-                this.pointIcon = L.icon({ iconUrl: 'editmarker.png', iconSize: [11, 11], iconAnchor: [6, 6] });
-            }
-            if(options.newPointIcon) {
-                this.newPointIcon = options.newPointIcon;
-            } else {
-                this.newPointIcon = L.icon({ iconUrl: 'editmarker2.png', iconSize: [11, 11], iconAnchor: [6, 6] });
-            }
+            if(!options.pointIcon)
+                this._options.pointIcon = L.icon({ iconUrl: 'editmarker.png', iconSize: [11, 11], iconAnchor: [6, 6] });
+            if(!options.newPointIcon)
+                this._options.newPointIcon = L.icon({ iconUrl: 'editmarker2.png', iconSize: [11, 11], iconAnchor: [6, 6] });
         };
 
         /**
@@ -144,7 +137,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 var polyline = that._map._editablePolylines[polylineNo];
                 for(var markerNo in polyline._markers) {
                     var marker = polyline._markers[markerNo];
-                    if(found < that.maxMarkers) {
+                    if(found < that._options.maxMarkers) {
                         that._setMarkerVisible(marker, bounds.contains(marker.getLatLng()));
                         that._setMarkerVisible(marker.newPointMarker, markerNo > 0 && bounds.contains(marker.getLatLng()));
                     } else {
@@ -221,7 +214,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         this._addMarkers = function(pointNo, latLng, fixNeighbourPositions) {
             var that = this;
             var points = this.getLatLngs();
-            var marker = L.marker(latLng, {draggable: true, icon: this.pointIcon});
+            var marker = L.marker(latLng, {draggable: true, icon: this._options.pointIcon});
 
             marker.newPointMarker = null;
             marker.on('dragstart', function(event) {
@@ -257,7 +250,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             var previousPoint = points[pointNo == 0 ? pointNo : pointNo - 1];
             var newPointMarker = L.marker([(latLng.lat + previousPoint.lat) / 2.,
                                            (latLng.lng + previousPoint.lng) / 2.],
-                                          {draggable: true, icon: this.newPointIcon});
+                                          {draggable: true, icon: this._options.newPointIcon});
             marker.newPointMarker = newPointMarker;
             newPointMarker.on('dragstart', function(event) {
                 var pointNo = that._getPointNo(event.target);
@@ -302,12 +295,10 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 // the splitted one need to be inserted immediately after:
                 var originalPolylineNo = that._map._editablePolylines.indexOf(that);
 
-                var newPolyline = L.Polyline.PolylineEditor(points, that._options, contexts, originalPolylineNo + 1)
-                                            .addTo(that._map);
+                L.Polyline.PolylineEditor(points, that._options, contexts, originalPolylineNo + 1)
+                                          .addTo(that._map);
 
                 that._showBoundMarkers();
-
-                console.log('Done split, _editablePolylines now:' + that._map._editablePolylines.length);
             });
 
             this._markers.splice(pointNo, 0, marker);
