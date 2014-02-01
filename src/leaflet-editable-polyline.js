@@ -1,4 +1,38 @@
 L.Polyline.polylineEditor = L.Polyline.extend({
+    _prepareMapIfNeeded: function() {
+        var that = this;
+
+        if(this._map._editablePolylines != null) {
+            return
+        }
+
+        // Container for all editable polylines on this map:
+        this._map._editablePolylines = [];
+
+        // Click anywhere on map to add a new point-polyline:
+        if(this._options.newPolylines) {
+            console.log('click na map');
+            that._map.on('click', function(event) {
+                console.log('click, target=' + (event.target == that._map) + ' type=' + event.type);
+                if(that.isBusy())
+                    return;
+
+                that._setBusy(true);
+
+                var latLng = event.latlng;
+                if(that._options.newPolylineConfirmMessage)
+                    if(!confirm(that._options.newPolylineConfirmMessage))
+                        return
+
+                var contexts = [{'originalPolylineNo': null, 'originalPointNo': null}];
+                L.Polyline.PolylineEditor([latLng], that._options, contexts).addTo(that._map);
+
+                that._setBusy(false);
+
+                that._showBoundMarkers();
+            });
+        }
+    },
     /**
      * Will add all needed methods to this polyline.
      */
@@ -6,10 +40,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         var that = this;
 
         this._init = function(options, contexts) {
-            // Container for all editable polylines on this map:
-            if(!('_editablePolylines' in this._map)) {
-                this._map._editablePolylines = [];
-            }
+            this._prepareMapIfNeeded();
 
             /*
              * Utility method added to this map to retreive editable 
@@ -55,29 +86,6 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             this._map.on("moveend", function(e) {
                 that._showBoundMarkers();
             });
-
-            // Click anywhere on map to add a new point-polyline:
-            if(this._options.newPolylines) {
-                console.log('click na map');
-                that._map.on('click', function(event) {
-                    if(that._isBusy())
-                        return;
-
-                    that._setBusy(true);
-
-                    var latLng = event.latlng;
-                    if(that._options.newPolylineConfirmMessage)
-                        if(!confirm(that._options.newPolylineConfirmMessage))
-                            return
-
-                    var contexts = [{'originalPolylineNo': null, 'originalPointNo': null}];
-                    L.Polyline.PolylineEditor([latLng], that._options, contexts).addTo(that._map);
-
-                    that._setBusy(false);
-
-                    that._showBoundMarkers();
-                });
-            }
 
             if(this._desiredPolylineNo && this._desiredPolylineNo != null) {
                 this._map._editablePolylines.splice(this._desiredPolylineNo, 0, this);
