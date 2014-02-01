@@ -10,9 +10,9 @@ get-leaflet-dist:
 	# Will retrieve leaflet files if needed:
 	test -f examples/leaflet.css || wget http://leafletjs.com/dist/leaflet.css -O examples/leaflet.css
 	test -f examples/leaflet.js || wget http://leafletjs.com/dist/leaflet.js -O examples/leaflet.js
-show-chromium:
+show-chromium: get-leaflet-dist
 	chromium-browser examples/index.html
-show-firefox:
+show-firefox: get-leaflet-dist
 	firefox examples/index.html
 github-pages: check-all-commited
 	git branch -D gh-pages
