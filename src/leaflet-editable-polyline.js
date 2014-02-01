@@ -264,8 +264,10 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             marker.on('dragend', function(event) {
                 var marker = event.target;
                 var pointNo = that._getPointNo(event.target);
-                that._setBusy(false);
-                that._reloadPolyline(pointNo);
+                setTimeout(function() {
+                    that._setBusy(false);
+                    that._reloadPolyline();
+                }, 25);
             });
             marker.on('contextmenu', function(event) {
                 var marker = event.target;
@@ -301,8 +303,10 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 var marker = event.target;
                 var pointNo = that._getPointNo(event.target);
                 that._addMarkers(pointNo, marker.getLatLng(), true);
-                that._setBusy(false);
-                that._reloadPolyline();
+                setTimeout(function() {
+                    that._setBusy(false);
+                    that._reloadPolyline();
+                }, 25);
             });
             newPointMarker.on('contextmenu', function(event) {
                 // 1. Remove this polyline from map
