@@ -135,6 +135,8 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 options.newPolylines = false;
             if(!('newPolylineConfirmMessage' in options))
                 options.newPolylineConfirmMessage = '';
+            if(!('addFirstLastPointEvent' in options))
+                options.addFirstLastPointEvent = 'click';
 
             this._options = options;
 
@@ -277,7 +279,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 that._markers.splice(pointNo, 1);
                 that._reloadPolyline(pointNo);
             });
-            marker.on('click', function(event) {
+            marker.on(that._options.addFirstLastPointEvent, function(event) {
                 var marker = event.target;
                 var pointNo = that._getPointNo(event.target);
                 if(pointNo == 0 || pointNo == that._markers.length - 1) {
