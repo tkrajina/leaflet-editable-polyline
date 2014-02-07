@@ -8,6 +8,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
 
         // Container for all editable polylines on this map:
         this._map._editablePolylines = [];
+        this._map._editablePolylinesEnabled = true;
 
         // Click anywhere on map to add a new point-polyline:
         if(this._options.newPolylines) {
@@ -48,7 +49,6 @@ L.Polyline.polylineEditor = L.Polyline.extend({
          * Enable/disable editing.
          */
         this._map.setEditablePolylinesEnabled = function(enabled) {
-            this._editablePolylinesEnabled = enabled;
             for(var i = 0; i < that._editablePolylines.length; i++) {
                 var polyline = that._editablePolylines[i];
                 if(enabled) {
@@ -57,6 +57,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                     polyline._hideAll();
                 }
             }
+            this._map._editablePolylinesEnabled = enabled;
         };
 
         /*
@@ -182,6 +183,11 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         this._showBoundMarkers = function() {
             if(that._map.isEditablePolylinesBusy()) {
                 console.log('Do not show because busy!');
+                return;
+            }
+
+            if(!that._map._editablePolylinesEnabled) {
+                console.log('Do not show because editing is disabled');
                 return;
             }
 
@@ -493,7 +499,6 @@ L.Polyline.polylineEditor.addInitHook(function () {
          * _hideAll().
          */
         this._busy = false;
-        this._enabled = true;
         this._initialized = false;
 
         this._init(this._options, this._contexts);
