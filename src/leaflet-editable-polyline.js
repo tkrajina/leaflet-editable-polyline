@@ -120,20 +120,6 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         };
 
         /**
-         * Add a custom event listener to all markers. The listener will be 
-         * called with two arguments: event and marker.
-         */
-        this.addListenerToEditableMarkers = function(eventName, listener) {
-            for(var markerNo in that._markers) {
-                var marker = that._markers[markerNo];
-                marker.on(eventName, function(event) {
-                    listener(event, marker);
-                    console.log('What if the markers is changed');
-                });
-            }
-        };
-
-        /**
          * Check if is busy adding/moving new nodes. Note, there may be 
          * *other* editable polylines on the same map which *are* busy.
          */
@@ -165,6 +151,10 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 options.newPolylineConfirmMessage = '';
             if(!('addFirstLastPointEvent' in options))
                 options.addFirstLastPointEvent = 'click';
+            if(!('customPointListeners' in options))
+                options.customPointListeners = {};
+            if(!('customNewPointListeners' in options))
+                options.customNewPointListeners = {};
 
             this._options = options;
 
@@ -377,6 +367,15 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             });
 
             this._markers.splice(pointNo, 0, marker);
+
+            // User-defined custom event listeners:
+            console.log('custom=' + that._options.customPointListeners);
+            if(that._options.customPointListeners)
+                for(var eventName in that._options.customPointListeners)
+                    marker.on(eventName, that._options.customPointListeners[eventName]);
+            if(that._options.customNewPointListeners)
+                for(var eventName in that._options.customNewPointListeners)
+                    newPointMarker.on(eventName, that._options.customNewPointListeners[eventName]);
 
             if(fixNeighbourPositions) {
                 this._fixNeighbourPositions(pointNo);
