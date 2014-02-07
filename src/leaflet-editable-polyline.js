@@ -268,7 +268,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 var pointNo = that._getPointNo(event.target);
                 setTimeout(function() {
                     that._setBusy(false);
-                    that._reloadPolyline();
+                    that._reloadPolyline(pointNo);
                 }, 25);
             });
             marker.on('contextmenu', function(event) {
