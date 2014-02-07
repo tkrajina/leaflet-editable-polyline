@@ -37,8 +37,8 @@ L.Polyline.polylineEditor = L.Polyline.extend({
          * Check if there is *any* busy editable polyline on this map.
          */
         this._map.isEditablePolylinesBusy = function() {
-            for(var i = 0; i < that._editablePolylines.length; i++)
-                if(that._editablePolylines[i]._isBusy())
+            for(var i = 0; i < that._map._editablePolylines.length; i++)
+                if(that._map._editablePolylines[i]._isBusy())
                     return true;
 
             return false;
@@ -122,7 +122,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
          * Add a custom event listener to all markers. The listener will be 
          * called with two arguments: event and marker.
          */
-        this.addListenerToEditableMarkers(eventName, listener) {
+        this.addListenerToEditableMarkers = function(eventName, listener) {
             for(var markerNo in that._markers) {
                 var marker = that._markers[markerNo];
                 marker.on(eventName, function(event) {
