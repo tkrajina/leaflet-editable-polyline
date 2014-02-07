@@ -14,7 +14,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             console.log('click na map');
             that._map.on('click', function(event) {
                 console.log('click, target=' + (event.target == that._map) + ' type=' + event.type);
-                if(that.isBusy())
+                if(that._map.isEditablePolylinesBusy())
                     return;
 
                 that._setBusy(true);
@@ -32,6 +32,40 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 that._showBoundMarkers();
             });
         }
+
+        /**
+         * Check if there is *any* busy editable polyline on this map.
+         */
+        this._map.isEditablePolylinesBusy = function() {
+            for(var i = 0; i < that._editablePolylines.length; i++)
+                if(that._editablePolylines[i]._isBusy())
+                    return true;
+
+            return false;
+        };
+
+        /**
+         * Enable/disable editing.
+         */
+        this._map.setEditablePolylinesEnabled = function(enabled) {
+            this._editablePolylinesEnabled = enabled;
+            for(var i = 0; i < that._editablePolylines.length; i++) {
+                var polyline = that._editablePolylines[i];
+                if(enabled) {
+                    polyline._showBoundMarkers();
+                } else {
+                    polyline._hideAll();
+                }
+            }
+        };
+
+        /*
+         * Utility method added to this map to retreive editable 
+         * polylines.
+         */
+        this._map.getEditablePolylines = function() {
+            return that._map._editablePolylines;
+        }
     },
     /**
      * Will add all needed methods to this polyline.
@@ -41,16 +75,6 @@ L.Polyline.polylineEditor = L.Polyline.extend({
 
         this._init = function(options, contexts) {
             this._prepareMapIfNeeded();
-
-            /*
-             * Utility method added to this map to retreive editable 
-             * polylines.
-             */
-            if(!this._map.getEditablePolylines) {
-                this._map.getEditablePolylines = function() {
-                    return that._map._editablePolylines;
-                }
-            }
 
             /**
              * Since all point editing is done by marker events, markers 
@@ -95,14 +119,17 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         };
 
         /**
-         * Check if there is *any* busy editable polyline on this map.
+         * Add a custom event listener to all markers. The listener will be 
+         * called with two arguments: event and marker.
          */
-        this.isBusy = function() {
-            for(var i = 0; i < that._map._editablePolylines.length; i++)
-                if(that._map._editablePolylines[i]._isBusy())
-                    return true;
-
-            return false;
+        this.addListenerToEditableMarkers(eventName, listener) {
+            for(var markerNo in that._markers) {
+                var marker = that._markers[markerNo];
+                marker.on(eventName, function(event) {
+                    listener(event, marker);
+                    console.log('What if the markers is changed');
+                });
+            }
         };
 
         /**
@@ -153,7 +180,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
          * bounds.
          */
         this._showBoundMarkers = function() {
-            if(that.isBusy()) {
+            if(that._map.isEditablePolylinesBusy()) {
                 console.log('Do not show because busy!');
                 return;
             }
@@ -466,6 +493,7 @@ L.Polyline.polylineEditor.addInitHook(function () {
          * _hideAll().
          */
         this._busy = false;
+        this._enabled = true;
         this._initialized = false;
 
         this._init(this._options, this._contexts);
