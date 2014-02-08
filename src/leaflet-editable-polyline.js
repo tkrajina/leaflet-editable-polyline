@@ -369,7 +369,6 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             this._markers.splice(pointNo, 0, marker);
 
             // User-defined custom event listeners:
-            console.log('custom=' + that._options.customPointListeners);
             if(that._options.customPointListeners)
                 for(var eventName in that._options.customPointListeners)
                     marker.on(eventName, that._options.customPointListeners[eventName]);
