@@ -49,15 +49,15 @@ L.Polyline.polylineEditor = L.Polyline.extend({
          * Enable/disable editing.
          */
         this._map.setEditablePolylinesEnabled = function(enabled) {
-            for(var i = 0; i < that._editablePolylines.length; i++) {
-                var polyline = that._editablePolylines[i];
+            that._map._editablePolylinesEnabled = enabled;
+            for(var i = 0; i < that._map._editablePolylines.length; i++) {
+                var polyline = that._map._editablePolylines[i];
                 if(enabled) {
                     polyline._showBoundMarkers();
                 } else {
                     polyline._hideAll();
                 }
             }
-            this._map._editablePolylinesEnabled = enabled;
         };
 
         /*
