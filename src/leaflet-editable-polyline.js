@@ -67,6 +67,13 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         this._map.getEditablePolylines = function() {
             return that._map._editablePolylines;
         }
+
+        this._map.fixAroundEditablePoint = function(marker) {
+            for(var i = 0; i < that._map._editablePolylines.length; i++) {
+                var polyline = that._map._editablePolylines[i];
+                polyline._reloadPolyline(marker);
+            }
+        }
     },
     /**
      * Will add all needed methods to this polyline.
@@ -259,7 +266,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         this._reloadPolyline = function(fixAroundPointNo) {
             that.setLatLngs(that._getMarkerLatLngs());
             if(fixAroundPointNo != null)
-                that._fixNeighbourPositions(fixAroundPointNo);
+                that._fixAround(fixAroundPointNo);
             that._showBoundMarkers();
         }
 
@@ -375,7 +382,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                     newPointMarker.on(eventName, that._options.customNewPointListeners[eventName]);
 
             if(fixNeighbourPositions) {
-                this._fixNeighbourPositions(pointNo);
+                this._fixAround(pointNo);
             }
 
             return marker;
@@ -403,10 +410,18 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         /**
          * Fix nearby new point markers when the new point is created.
          */
-        this._fixNeighbourPositions = function(pointNo) {
-            var previousMarker = pointNo == 0 ? null : this._markers[pointNo - 1];
-            var marker = this._markers[pointNo];
-            var nextMarker = pointNo < this._markers.length - 1 ? this._markers[pointNo + 1] : null;
+        this._fixAround = function(pointNoOrMarker) {
+            if((typeof pointNoOrMarker) == 'number')
+                var pointNo = pointNoOrMarker;
+            else
+                var pointNo = that._markers.indexOf(pointNoOrMarker);
+
+            if(pointNo < 0)
+                return;
+
+            var previousMarker = pointNo == 0 ? null : that._markers[pointNo - 1];
+            var marker = that._markers[pointNo];
+            var nextMarker = pointNo < that._markers.length - 1 ? that._markers[pointNo + 1] : null;
             if(marker && previousMarker) {
                 marker.newPointMarker.setLatLng([(previousMarker.getLatLng().lat + marker.getLatLng().lat) / 2.,
                                                  (previousMarker.getLatLng().lng + marker.getLatLng().lng) / 2.]);
