@@ -192,8 +192,6 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 }
             }
 
-            console.log('found=' + found);
-
             for(var polylineNo in that._map._editablePolylines) {
                 var polyline = that._map._editablePolylines[polylineNo];
                 for(var markerNo in polyline._markers) {
