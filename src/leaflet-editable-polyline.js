@@ -543,9 +543,18 @@ L.Polyline.polylineEditor.addInitHook(function () {
  * markers before this one are delted or new added.
  */
 L.Polyline.PolylineEditor = function(latlngs, options, contexts, polylineNo) {
+    // Since the app code may not be able to explicitly call the 
+    // initialization of all editable polylines (if the user created a new 
+    // one by splitting an existing), with this method you can control the 
+    // options for new polylines:
+    if(options.prepareOptions) {
+        options.prepareOptions(options);
+    }
+
     var result = new L.Polyline.polylineEditor(latlngs, options);
     result._options = options;
     result._contexts = contexts;
     result._desiredPolylineNo = polylineNo
+
     return result;
 };
