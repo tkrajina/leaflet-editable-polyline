@@ -8,13 +8,14 @@ L.Polyline.polylineEditor = L.Polyline.extend({
 
         // Container for all editable polylines on this map:
         this._map._editablePolylines = [];
+        this._map._editablePolylinesEnabled = true;
 
         // Click anywhere on map to add a new point-polyline:
         if(this._options.newPolylines) {
             console.log('click na map');
             that._map.on('click', function(event) {
                 console.log('click, target=' + (event.target == that._map) + ' type=' + event.type);
-                if(that.isBusy())
+                if(that._map.isEditablePolylinesBusy())
                     return;
 
                 that._setBusy(true);
@@ -32,6 +33,47 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 that._showBoundMarkers();
             });
         }
+
+        /**
+         * Check if there is *any* busy editable polyline on this map.
+         */
+        this._map.isEditablePolylinesBusy = function() {
+            for(var i = 0; i < that._map._editablePolylines.length; i++)
+                if(that._map._editablePolylines[i]._isBusy())
+                    return true;
+
+            return false;
+        };
+
+        /**
+         * Enable/disable editing.
+         */
+        this._map.setEditablePolylinesEnabled = function(enabled) {
+            that._map._editablePolylinesEnabled = enabled;
+            for(var i = 0; i < that._map._editablePolylines.length; i++) {
+                var polyline = that._map._editablePolylines[i];
+                if(enabled) {
+                    polyline._showBoundMarkers();
+                } else {
+                    polyline._hideAll();
+                }
+            }
+        };
+
+        /*
+         * Utility method added to this map to retreive editable 
+         * polylines.
+         */
+        this._map.getEditablePolylines = function() {
+            return that._map._editablePolylines;
+        }
+
+        this._map.fixAroundEditablePoint = function(marker) {
+            for(var i = 0; i < that._map._editablePolylines.length; i++) {
+                var polyline = that._map._editablePolylines[i];
+                polyline._reloadPolyline(marker);
+            }
+        }
     },
     /**
      * Will add all needed methods to this polyline.
@@ -41,16 +83,6 @@ L.Polyline.polylineEditor = L.Polyline.extend({
 
         this._init = function(options, contexts) {
             this._prepareMapIfNeeded();
-
-            /*
-             * Utility method added to this map to retreive editable 
-             * polylines.
-             */
-            if(!this._map.getEditablePolylines) {
-                this._map.getEditablePolylines = function() {
-                    return that._map._editablePolylines;
-                }
-            }
 
             /**
              * Since all point editing is done by marker events, markers 
@@ -95,17 +127,6 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         };
 
         /**
-         * Check if there is *any* busy editable polyline on this map.
-         */
-        this.isBusy = function() {
-            for(var i = 0; i < that._map._editablePolylines.length; i++)
-                if(that._map._editablePolylines[i]._isBusy())
-                    return true;
-
-            return false;
-        };
-
-        /**
          * Check if is busy adding/moving new nodes. Note, there may be 
          * *other* editable polylines on the same map which *are* busy.
          */
@@ -137,6 +158,10 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 options.newPolylineConfirmMessage = '';
             if(!('addFirstLastPointEvent' in options))
                 options.addFirstLastPointEvent = 'click';
+            if(!('customPointListeners' in options))
+                options.customPointListeners = {};
+            if(!('customNewPointListeners' in options))
+                options.customNewPointListeners = {};
 
             this._options = options;
 
@@ -153,8 +178,13 @@ L.Polyline.polylineEditor = L.Polyline.extend({
          * bounds.
          */
         this._showBoundMarkers = function() {
-            if(that.isBusy()) {
+            if(that._map.isEditablePolylinesBusy()) {
                 console.log('Do not show because busy!');
+                return;
+            }
+
+            if(!that._map._editablePolylinesEnabled) {
+                console.log('Do not show because editing is disabled');
                 return;
             }
 
@@ -168,8 +198,6 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                         found += 1;
                 }
             }
-
-            console.log('found=' + found);
 
             for(var polylineNo in that._map._editablePolylines) {
                 var polyline = that._map._editablePolylines[polylineNo];
@@ -238,7 +266,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         this._reloadPolyline = function(fixAroundPointNo) {
             that.setLatLngs(that._getMarkerLatLngs());
             if(fixAroundPointNo != null)
-                that._fixNeighbourPositions(fixAroundPointNo);
+                that._fixAround(fixAroundPointNo);
             that._showBoundMarkers();
         }
 
@@ -345,8 +373,16 @@ L.Polyline.polylineEditor = L.Polyline.extend({
 
             this._markers.splice(pointNo, 0, marker);
 
+            // User-defined custom event listeners:
+            if(that._options.customPointListeners)
+                for(var eventName in that._options.customPointListeners)
+                    marker.on(eventName, that._options.customPointListeners[eventName]);
+            if(that._options.customNewPointListeners)
+                for(var eventName in that._options.customNewPointListeners)
+                    newPointMarker.on(eventName, that._options.customNewPointListeners[eventName]);
+
             if(fixNeighbourPositions) {
-                this._fixNeighbourPositions(pointNo);
+                this._fixAround(pointNo);
             }
 
             return marker;
@@ -374,10 +410,18 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         /**
          * Fix nearby new point markers when the new point is created.
          */
-        this._fixNeighbourPositions = function(pointNo) {
-            var previousMarker = pointNo == 0 ? null : this._markers[pointNo - 1];
-            var marker = this._markers[pointNo];
-            var nextMarker = pointNo < this._markers.length - 1 ? this._markers[pointNo + 1] : null;
+        this._fixAround = function(pointNoOrMarker) {
+            if((typeof pointNoOrMarker) == 'number')
+                var pointNo = pointNoOrMarker;
+            else
+                var pointNo = that._markers.indexOf(pointNoOrMarker);
+
+            if(pointNo < 0)
+                return;
+
+            var previousMarker = pointNo == 0 ? null : that._markers[pointNo - 1];
+            var marker = that._markers[pointNo];
+            var nextMarker = pointNo < that._markers.length - 1 ? that._markers[pointNo + 1] : null;
             if(marker && previousMarker) {
                 marker.newPointMarker.setLatLng([(previousMarker.getLatLng().lat + marker.getLatLng().lat) / 2.,
                                                  (previousMarker.getLatLng().lng + marker.getLatLng().lng) / 2.]);
@@ -496,9 +540,18 @@ L.Polyline.polylineEditor.addInitHook(function () {
  * markers before this one are delted or new added.
  */
 L.Polyline.PolylineEditor = function(latlngs, options, contexts, polylineNo) {
+    // Since the app code may not be able to explicitly call the 
+    // initialization of all editable polylines (if the user created a new 
+    // one by splitting an existing), with this method you can control the 
+    // options for new polylines:
+    if(options.prepareOptions) {
+        options.prepareOptions(options);
+    }
+
     var result = new L.Polyline.polylineEditor(latlngs, options);
     result._options = options;
     result._contexts = contexts;
     result._desiredPolylineNo = polylineNo
+
     return result;
 };
