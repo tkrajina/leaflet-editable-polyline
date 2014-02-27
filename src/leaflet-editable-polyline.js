@@ -285,7 +285,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             marker.newPointMarker = null;
             marker.on('dragstart', function(event) {
                 var pointNo = that._getPointNo(event.target);
-                var previousPoint = pointNo == null ? null : that._markers[pointNo - 1].getLatLng();
+                var previousPoint = pointNo && pointNo > 0 ? that._markers[pointNo - 1].getLatLng() : null;
                 var nextPoint = pointNo < that._markers.length - 1 ? that._markers[pointNo + 1].getLatLng() : null;
                 that._setupDragLines(marker, previousPoint, nextPoint);
                 that._setBusy(true);
@@ -459,7 +459,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             var line2 = null;
             if(point1) line1 = L.polyline([marker.getLatLng(), point1], {dasharray: "5,1", weight: 1})
                                 .addTo(that._map);
-            if(point2) line2 = L.polyline([marker.getLatLng(), point1], {dasharray: "5,1", weight: 1})
+            if(point2) line2 = L.polyline([marker.getLatLng(), point2], {dasharray: "5,1", weight: 1})
                                 .addTo(that._map);
 
             var moveHandler = function(event) {
