@@ -305,6 +305,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 var marker = event.target;
                 var pointNo = that._getPointNo(event.target);
                 console.log('pointNo=' + pointNo + ' that._markers.length=' + that._markers.length);
+                event.dont;
                 if(pointNo == 0 || pointNo == that._markers.length - 1) {
                     console.log('first or last');
                     that._prepareForNewPoint(marker, pointNo == 0 ? 0 : pointNo + 1);
@@ -388,13 +389,20 @@ L.Polyline.polylineEditor = L.Polyline.extend({
          * Event handlers for first and last point.
          */
         this._prepareForNewPoint = function(marker, pointNo) {
-            that._hideAll();
-            that._setupDragLines(marker, marker.getLatLng());
-            that._map.once('click', function(event) {
-                console.log('dodajemo na ' + pointNo + ' - ' + event.latlng);
-                that._addMarkers(pointNo, event.latlng, true);
-                that._reloadPolyline();
-            });
+            // This is slightly delayed to prevent the same propagated event 
+            // to be catched here:
+            setTimeout(
+                function() {
+                    that._hideAll();
+                    that._setupDragLines(marker, marker.getLatLng());
+                    that._map.once('click', function(event) {
+                        console.log('dodajemo na ' + pointNo + ' - ' + event.latlng);
+                        that._addMarkers(pointNo, event.latlng, true);
+                        that._reloadPolyline();
+                    });
+                },
+                100
+            );
         };
 
         /**
