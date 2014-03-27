@@ -46,6 +46,7 @@ Options is a normal Leaflet polyline options object with some additions:
  * **maxMarkers** is a max number of editable markers to be shown. That means that if the current map bounds are such that more than maxMarkers points of the polyline are in map bounds -- the polyline **will not be editable**. This can be used for very large polylines where too many editable markers would make editing too CPU-intennsive.
  * **pointIcon** icon to be shown for point markers.
  * **newPointIcon** icon to be shown for middle point markers (markers used when creating new points).
+ * **newPolylines** if true then double-click on map will create a new polyline (with only one point).
 
 The editing can be done with:
 
