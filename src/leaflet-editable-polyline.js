@@ -34,8 +34,9 @@ L.Polyline.polylineEditor = L.Polyline.extend({
          * Check if there is *any* busy editable polyline on this map.
          */
         this._map.isEditablePolylinesBusy = function() {
-            for(var i = 0; i < that._map._editablePolylines.length; i++)
-                if(that._map._editablePolylines[i]._isBusy())
+            var map = this;
+            for(var i = 0; i < map._editablePolylines.length; i++)
+                if(map._editablePolylines[i]._isBusy())
                     return true;
 
             return false;
@@ -45,9 +46,10 @@ L.Polyline.polylineEditor = L.Polyline.extend({
          * Enable/disable editing.
          */
         this._map.setEditablePolylinesEnabled = function(enabled) {
-            that._map._editablePolylinesEnabled = enabled;
-            for(var i = 0; i < that._map._editablePolylines.length; i++) {
-                var polyline = that._map._editablePolylines[i];
+            var map = this;
+            map._editablePolylinesEnabled = enabled;
+            for(var i = 0; i < map._editablePolylines.length; i++) {
+                var polyline = map._editablePolylines[i];
                 if(enabled) {
                     polyline._showBoundMarkers();
                 } else {
@@ -61,12 +63,14 @@ L.Polyline.polylineEditor = L.Polyline.extend({
          * polylines.
          */
         this._map.getEditablePolylines = function() {
-            return that._map._editablePolylines;
+            var map = this;
+            return map._editablePolylines;
         }
 
         this._map.fixAroundEditablePoint = function(marker) {
-            for(var i = 0; i < that._map._editablePolylines.length; i++) {
-                var polyline = that._map._editablePolylines[i];
+            var map = this;
+            for(var i = 0; i < map._editablePolylines.length; i++) {
+                var polyline = map._editablePolylines[i];
                 polyline._reloadPolyline(marker);
             }
         }
@@ -174,6 +178,10 @@ L.Polyline.polylineEditor = L.Polyline.extend({
          * bounds.
          */
         this._showBoundMarkers = function() {
+            if (!that._map) {
+                return;
+            }
+            
             this._setBusy(false);
 
             if(!that._map._editablePolylinesEnabled) {
@@ -468,13 +476,15 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             };
 
             var stopHandler = function(event) {
-                that._map.off('mousemove', moveHandler);
-                marker.off('dragend', stopHandler);
-                if(line1) that._map.removeLayer(line1);
-                if(line2) that._map.removeLayer(line2);
-                console.log('STOPPED');
-                if(event.target != that._map) {
-                    that._map.fire('click', event);
+                if (that._map) {
+                    that._map.off('mousemove', moveHandler);
+                    marker.off('dragend', stopHandler);
+                    if(line1) that._map.removeLayer(line1);
+                    if(line2) that._map.removeLayer(line2);
+                    console.log('STOPPED');
+                    if(event.target != that._map) {
+                        that._map.fire('click', event);
+                    }
                 }
             };
 
