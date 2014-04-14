@@ -530,6 +530,11 @@ L.Polyline.polylineEditor.addInitHook(function () {
         var polylines = map.getEditablePolylines();
         var index = polylines.indexOf(polyline);
         if (index > -1) {
+            polylines[index]._markers.forEach(function(marker) {
+                map.removeLayer(marker);
+                if(marker.newPointMarker)
+                    map.removeLayer(marker.newPointMarker);
+            });
             polylines.splice(index, 1);
         }
     });
