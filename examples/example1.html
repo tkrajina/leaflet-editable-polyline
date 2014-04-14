@@ -13,6 +13,7 @@
 
     <br/> <br/>
     <a href="javascript:void(dumpPoints())">Get points</a>
+    <a href="javascript:void(remove())">Remove polyline</a>
     <br/> <br/>
     <textarea id="pointsTextArea" rows="5" cols="70"></textarea>
 
@@ -82,6 +83,11 @@
                 });
                 pointsTextArea.innerHTML += '----------------------------------------------------------------------------------------------------\n';
             });
+        };
+
+        /* Check that markers are not left after the polyline is removed! */
+        var remove = function() {
+            map.removeLayer(polyline);
         };
 
     </script>
