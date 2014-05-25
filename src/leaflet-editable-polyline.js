@@ -404,6 +404,9 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                     that._hideAll();
                     that._setupDragLines(marker, marker.getLatLng());
                     that._map.once('click', function(event) {
+                        if(that._markers.length == 1) {
+                            pointNo += 1;
+                        }
                         console.log('dodajemo na ' + pointNo + ' - ' + event.latlng);
                         that._addMarkers(pointNo, event.latlng, true);
                         that._reloadPolyline();
@@ -500,7 +503,6 @@ L.Polyline.polylineEditor = L.Polyline.extend({
 });
 
 L.Polyline.polylineEditor.addInitHook(function () {
-
     this.on('add', function(event) {
         this._map = event.target._map;
         this._addMethods();
