@@ -6,13 +6,14 @@
 
     <link rel="stylesheet" href="leaflet.css" />
     <script src="leaflet.js"></script>
-    <script src="leaflet-editable-polyline.js"></script>
+    <script src="../src/leaflet-editable-polyline.js"></script>
 </head>
 <body>
     <div id="map" style="width: 400px; height: 300px"></div>
 
     <br/> <br/>
     <a href="javascript:void(dumpPoints())">Get points</a>
+    <a href="javascript:void(remove())">Remove polyline</a>
     <br/> <br/>
     <textarea id="pointsTextArea" rows="5" cols="70"></textarea>
 
@@ -55,7 +56,15 @@
                 [45.2756791761, 13.7202823162]
         ];
 
-        var polyline = L.Polyline.PolylineEditor(coordinates, {maxMarkers: 100}).addTo(map);
+        var polylineOptions = {
+                // The user can add new polylines by clicking anywhere on the map:
+                newPolylines: true,
+                newPolylineConfirmMessage: 'Add a new polyline here?',
+                // Show editable markers only if less than this number are in map bounds:
+                maxMarkers: 100
+        }
+
+        var polyline = L.Polyline.PolylineEditor(coordinates, polylineOptions).addTo(map);
 
         map.fitBounds(polyline.getBounds());
 
@@ -74,6 +83,11 @@
                 });
                 pointsTextArea.innerHTML += '----------------------------------------------------------------------------------------------------\n';
             });
+        };
+
+        /* Check that markers are not left after the polyline is removed! */
+        var remove = function() {
+            map.removeLayer(polyline);
         };
 
     </script>

@@ -3,5 +3,4 @@ tags
 *.swo
 examples/leaflet.css
 examples/leaflet.js
-examples/leaflet-editable-polyline.js
 dist/*
