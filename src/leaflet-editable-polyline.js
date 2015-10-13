@@ -1,6 +1,7 @@
 L.Polyline.polylineEditor = L.Polyline.extend({
     _prepareMapIfNeeded: function() {
         var that = this;
+        that._changed = false;
 
         if(this._map._editablePolylines != null) {
             return
@@ -27,6 +28,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 L.Polyline.PolylineEditor([latLng], that._options, contexts).addTo(that._map);
 
                 that._showBoundMarkers();
+                that._changed = true;
             });
         }
 
@@ -144,6 +146,10 @@ L.Polyline.polylineEditor = L.Polyline.extend({
         this.getPoints = function() {
             return this._markers;
         };
+
+        this.isChanged = function() {
+            return this._changed;
+        }
 
         this._parseOptions = function(options) {
             if(!options)
@@ -270,6 +276,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             if(fixAroundPointNo != null)
                 that._fixAround(fixAroundPointNo);
             that._showBoundMarkers();
+            that._changed = true;
         }
 
         /**
