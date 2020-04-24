@@ -1,5 +1,6 @@
 GIT_PORCELAIN_STATUS=$(shell git status --porcelain)
 VERSION=$(shell head -1 VERSION)
+LEAFLET_VERSION=1.6.0
 
 build: clean
 	mkdir dist
@@ -8,10 +9,10 @@ clean:
 	rm -Rf dist
 get-leaflet-dist:
 	# Will retrieve leaflet files if needed:
-	test -f examples/leaflet.css || wget http://leafletjs.com/dist/leaflet.css -O examples/leaflet.css
-	test -f examples/leaflet.js || wget http://leafletjs.com/dist/leaflet.js -O examples/leaflet.js
-show-chromium: get-leaflet-dist
-	chromium-browser examples/index.html
+	wget https://unpkg.com/leaflet@$(LEAFLET_VERSION)/dist/leaflet.css -O examples/leaflet.css
+	wget https://unpkg.com/leaflet@$(LEAFLET_VERSION)/dist/leaflet.js -O examples/leaflet.js
+open-examples: get-leaflet-dist
+	open examples/index.html
 show-firefox: get-leaflet-dist
 	firefox examples/index.html
 github-pages: check-all-commited
