@@ -98,7 +98,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             var points = this.getLatLngs();
             var length = points.length;
             for(var i = 0; i < length; i++) {
-                var marker = this._addMarkers(i, points[i]);
+                var marker = this._addMarkers(i, points[i], contexts ? contexts[i] : null);
                 if(! ('context' in marker)) {
                     marker.context = {}
                     if(that._contexts != null) {
@@ -286,10 +286,15 @@ L.Polyline.polylineEditor = L.Polyline.extend({
          * Markers are not added on the map here, the marker.addTo(map) is called 
          * only later when needed first time because of performance issues.
          */
-        this._addMarkers = function(pointNo, latLng, fixNeighbourPositions) {
+        this._addMarkers = function(pointNo, latLng, context, fixNeighbourPositions) {
             var that = this;
             var points = this.getLatLngs();
-            var marker = L.marker(latLng, {draggable: true, icon: this._options.pointIcon});
+
+            if (this._options.newMarker) {
+                var marker = this._options.newMarker(latLng, context);
+            } else {
+                var marker = L.marker(latLng, {draggable: true, icon: this._options.pointIcon});
+            }
 
             marker.newPointMarker = null;
             marker.on('dragstart', function(event) {
@@ -345,7 +350,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             newPointMarker.on('dragend', function(event) {
                 var marker = event.target;
                 var pointNo = that._getPointNo(event.target);
-                that._addMarkers(pointNo, marker.getLatLng(), true);
+                that._addMarkers(pointNo, marker.getLatLng(), null, true);
                 setTimeout(function() {
                     that._reloadPolyline();
                 }, 25);
@@ -415,7 +420,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                             pointNo += 1;
                         }
                         console.log('dodajemo na ' + pointNo + ' - ' + event.latlng);
-                        that._addMarkers(pointNo, event.latlng, true);
+                        that._addMarkers(pointNo, event.latlng, null, true);
                         that._reloadPolyline();
                     });
                 },
