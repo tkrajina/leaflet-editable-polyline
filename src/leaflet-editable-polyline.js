@@ -291,7 +291,7 @@ L.Polyline.polylineEditor = L.Polyline.extend({
             var points = this.getLatLngs();
 
             if (this._options.newMarker) {
-                var marker = this._options.newMarker(latLng, context);
+                var marker = this._options.newMarker(latLng, context, that._options, that._map);
             } else {
                 var marker = L.marker(latLng, {draggable: true, icon: this._options.pointIcon});
             }

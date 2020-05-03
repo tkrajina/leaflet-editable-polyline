@@ -63,8 +63,22 @@
                     newPolylineConfirmMessage: 'Add a new polyline here?',
                     // Show editable markers only if less than this number are in map bounds:
                     maxMarkers: 100,
-                    newMarker: function(latLng, context) {
-                        return L.circle(latLng, Math.random() * 50, { draggable: true, fill: true, fillOpacity: 0.3, color: '#ff00ff' });
+                    newMarker: function(latLng, markerContext, options, map) {
+                        var marker = L.marker(latLng, {draggable: true, icon: options.pointIcon});
+
+                        let circle = L.circleMarker(latLng, { radius: 10 + Math.random() * 20, fill: true, fillOpacity: 0.3, color: '#ff00ff' });
+                        circle.addTo(map);
+
+                        marker.on('dragstart', function(event) {
+                            map.removeLayer(circle);
+                        });
+                        marker.on('dragend', function(event) {
+                            var latlng = event.target.getLatLng();
+                            circle.setLatLng(latlng);
+                            circle.addTo(map);
+                        });
+
+                        return marker;
                     }
             }
 
