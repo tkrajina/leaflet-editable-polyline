@@ -64,9 +64,11 @@
                     // Show editable markers only if less than this number are in map bounds:
                     maxMarkers: 100,
                     newMarker: function(latLng, markerContext, options, map) {
-                        var marker = L.marker(latLng, {draggable: true, icon: options.pointIcon});
+                        const radius = 10 + Math.random() * 20;
+                        const icon = L.icon({iconUrl: "empty.gif", iconSize: [radius, radius], iconAnchor: [radius/2, radius/2]});
+                        var marker = L.marker(latLng, {draggable: true, icon: icon});
 
-                        let circle = L.circleMarker(latLng, { radius: 10 + Math.random() * 20, fill: true, fillOpacity: 0.3, color: '#ff00ff' });
+                        let circle = L.circleMarker(latLng, { radius: radius, fill: true, fillOpacity: 0.3, color: '#ff00ff' });
                         circle.addTo(map);
 
                         marker.on('dragstart', function(event) {
