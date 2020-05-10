@@ -296,8 +296,15 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 var marker = L.marker(latLng, {draggable: true, icon: this._options.pointIcon});
             }
 
+            if (marker.additionalComponent) {
+                marker.additionalComponent.addTo(map);
+            }
+
             marker.newPointMarker = null;
             marker.on('dragstart', function(event) {
+                if (marker.additionalComponent) {
+                    map.removeLayer(marker.additionalComponent);
+                }
                 var pointNo = that._getPointNo(event.target);
                 var previousPoint = pointNo && pointNo > 0 ? that._markers[pointNo - 1].getLatLng() : null;
                 var nextPoint = pointNo < that._markers.length - 1 ? that._markers[pointNo + 1].getLatLng() : null;
@@ -305,7 +312,11 @@ L.Polyline.polylineEditor = L.Polyline.extend({
                 that._hideAll(marker);
             });
             marker.on('dragend', function(event) {
-                var marker = event.target;
+                if (marker.additionalComponent) {
+                    var latlng = event.target.getLatLng();
+                    marker.additionalComponent.setLatLng(latlng);
+                    marker.additionalComponent.addTo(map);
+                }
                 var pointNo = that._getPointNo(event.target);
                 setTimeout(function() {
                     that._reloadPolyline(pointNo);
@@ -545,6 +556,9 @@ L.Polyline.polylineEditor.addInitHook(function () {
         var index = polylines.indexOf(polyline);
         if (index > -1) {
             polylines[index]._markers.forEach(function(marker) {
+                if (marker.additionalComponent) {
+                    map.removeLayer(marker.additionalComponent);
+                }
                 map.removeLayer(marker);
                 if(marker.newPointMarker)
                     map.removeLayer(marker.newPointMarker);

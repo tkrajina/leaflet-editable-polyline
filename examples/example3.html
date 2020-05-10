@@ -64,22 +64,11 @@
                     // Show editable markers only if less than this number are in map bounds:
                     maxMarkers: 100,
                     newMarker: function(latLng, markerContext, options, map) {
-                        const radius = 10 + Math.random() * 20;
+                        const radius = 10 + Math.random() * 20; // radious can be retrieved from the options or the context:
                         const icon = L.icon({iconUrl: "empty.gif", iconSize: [radius, radius], iconAnchor: [radius/2, radius/2]});
                         var marker = L.marker(latLng, {draggable: true, icon: icon});
-
-                        let circle = L.circleMarker(latLng, { radius: radius, fill: true, fillOpacity: 0.3, color: '#ff00ff' });
-                        circle.addTo(map);
-
-                        marker.on('dragstart', function(event) {
-                            map.removeLayer(circle);
-                        });
-                        marker.on('dragend', function(event) {
-                            var latlng = event.target.getLatLng();
-                            circle.setLatLng(latlng);
-                            circle.addTo(map);
-                        });
-
+                        // If a marker has a additionalComponent field -- it will "follow" the marker when it updates:
+                        marker.additionalComponent = L.circleMarker(latLng, { radius: radius, fill: true, fillOpacity: 0.3, color: '#ff00ff' });
                         return marker;
                     }
             }
